@@ -1,0 +1,438 @@
+/* Color Palette */
+:root {
+    --color-dark-bg: #000000; /* Deep Charcoal/Black */
+    --color-light-bg: rgba(15, 22, 48, 0.75); /* Dark blue with transparency */
+    --color-accent-neon: #f5ff1a; /* Neon yellow */
+    --color-text-primary: #FFFFFF;
+    --color-text-secondary: #AAAAAA;
+    --font-primary: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    --transition-speed: 0.3s ease-in-out;
+}
+
+/* Global Reset and Base Styles */
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+    font-family: var(--font-primary);
+    background-color: var(--color-dark-bg);
+    color: var(--color-text-primary);
+    line-height: 1.6;
+    overflow-x: hidden;
+    min-width: 320px;
+}
+
+/* Typography */
+h1 {
+    font-size: 4.5rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    line-height: 1.1;
+    color: var(--color-text-primary);
+    letter-spacing: -0.05em;
+}
+
+h2 {
+    font-size: 3rem;
+    font-weight: 700;
+    color: var(--color-accent-neon);
+    text-align: center;
+    margin-bottom: 2rem;
+}
+
+.tagline {
+    font-size: 1.1rem;
+    color: var(--color-accent-neon);
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    margin-bottom: 1rem;
+}
+
+/* Layout and Structure */
+.section-padding { padding: 8rem 5%; }
+.section-subtext {
+    max-width: 800px;
+    margin: 0 auto 4rem;
+    text-align: center;
+    color: var(--color-text-secondary);
+}
+
+/* --- Navigation --- */
+#main-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1.5rem 5%;
+    position: fixed;
+    width: 100%;
+    z-index: 1000;
+    background-color: rgba(0, 0, 0, 1); /* solid black background */
+    box-shadow: 0 2px 8px rgba(0,0,0,0.3); /* optional subtle shadow for depth */
+    transition: background-color 0.3s, box-shadow 0.3s;
+}
+.logo {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--color-text-primary);
+    text-decoration: none;
+}
+#main-nav ul {
+    list-style: none;
+    display: flex;
+    gap: 2rem;
+    align-items: center;
+}
+#main-nav a {
+    color: var(--color-text-primary);
+    text-decoration: none;
+    font-weight: 500;
+    padding: 0.5rem 0;
+    transition: color var(--transition-speed);
+}
+#main-nav a:hover { color: var(--color-accent-neon); }
+
+#main-nav .nav-shiny-btn {
+    /* Pushes the button up just enough to visually align its text baseline
+       with the text links, compensating for its padding */
+    transform: translateY(3px); 
+    /* The button must be display: inline-flex or inline-block for transform to work */
+    display: inline-block; 
+}
+#vanta-bg {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: -1; /* Behind all content */
+}
+/* --- HERO Section --- */
+#hero {
+    height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    position: relative;
+    z-index: 1;
+}
+#hero-animation-canvas {
+    position: absolute;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    /* Will be replaced by advanced JS/WebGL animation */
+    /* background: radial-gradient(circle at 50% 50%, rgba(0,255,255,0.05) 0%, rgba(17,17,17,1) 70%);
+    opacity: .9; */
+    z-index: -1;
+}
+.hero-content {
+    max-width: 1000px;
+    padding-top: 5rem;
+    margin-left: auto;
+    margin-right: auto;
+}
+.hero-content .subtext {
+    font-size: 1.25rem;
+    margin: 1.5rem auto 3rem;
+    color: var(--color-text-secondary);
+}
+
+/* --- PILLARS / Services --- */
+.pillars-container {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 3rem;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+/* --- PILLARS / Services Ultra-Subtle Blue Shine Effect --- */
+.pillar {
+    position: relative;
+    overflow: hidden;
+    background-color: var(--color-light-bg);
+    border: 1px solid rgba(0, 255, 255, 0.2);
+    padding: 3rem;
+    border-radius: 12px;
+    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.5);
+    transition: transform var(--transition-speed), box-shadow var(--transition-speed);
+}
+
+.pillar::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: linear-gradient(
+        120deg, 
+        rgba(0,255,255,0.01) 0%,  /* ultra-subtle blue edges */
+        rgba(0,255,255,0.03) 50%, /* soft blue highlight */
+        rgba(0,255,255,0.01) 100%
+    );
+    transform: rotate(25deg) translateX(-100%);
+    transition: transform 1s ease;
+    pointer-events: none;
+}
+
+.pillar:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 25px rgba(0, 255, 255, 0.1); /* soft neon blue glow */
+}
+
+.pillar:hover::before {
+    transform: rotate(25deg) translateX(160%);
+}
+
+.pillar h3 {
+    font-size: 2rem;
+    color: var(--color-accent-neon);
+    margin-bottom: 1rem;
+}
+.pillar-link {
+    display: block;
+    margin-top: 1.5rem;
+    color: var(--color-accent-neon);
+    text-decoration: none;
+    font-weight: 600;
+}
+
+/* --- ABOUT Section (Light Contrast) ---
+#about { background-color: var(--color-light-bg); } */
+#about h2 { color: var(--color-text-primary); } /* Keep headline white here */
+#about .section-subtext { color: var(--color-accent-neon); } /* Make the subtext pop */
+
+#services h2 { color: var(--color-text-primary); } /* Match Who We Are heading color */
+#services .section-subtext { color: var(--color-accent-neon); } /* Match subtext accent */
+/* Center the single team member */
+.team-container {
+    display: flex;
+    justify-content: center;  /* centers horizontally */
+    width: 100%;
+    margin: 2rem auto 0;
+}
+
+/* Pillar card styling remains the same */
+.team-member.pillar {
+    position: relative;
+    overflow: hidden;
+    background-color: var(--color-light-bg);
+    border: 1px solid rgba(0, 255, 255, 0.2);
+    padding: 3rem;
+    border-radius: 12px;
+    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.5);
+    max-width: 350px;
+    text-align: center;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+/* Hover shine effect */
+.team-member.pillar::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: linear-gradient(
+        120deg,
+        rgba(0,255,255,0.01) 0%,
+        rgba(0,255,255,0.03) 50%,
+        rgba(0,255,255,0.01) 100%
+    );
+    transform: rotate(25deg) translateX(-100%);
+    transition: transform 1s ease;
+    pointer-events: none;
+}
+
+.team-member.pillar:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 25px rgba(0, 255, 255, 0.1);
+}
+
+.team-member.pillar:hover::before {
+    transform: rotate(25deg) translateX(160%);
+}
+
+/* Headshot inside the card */
+.team-member .headshot {
+    width: 150px;
+    height: 150px;
+    object-fit: cover;
+    border-radius: 50%;
+    border: 3px solid var(--color-accent-neon);
+    margin-bottom: 1rem;
+}
+
+.team-member h4 {
+    color: var(--color-accent-neon);
+    font-size: 1.5rem;
+    margin-bottom: 0.25rem;
+}
+
+.team-member .role {
+    color: var(--color-accent-neon);
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+}
+
+.team-member .bio-snippet {
+    color: var(--color-text-secondary);
+    font-size: 0.95rem;
+}
+
+.value-propositions {
+    list-style: none;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 2rem;
+    margin-bottom: 3rem;
+}
+.value-propositions h4 {
+    font-size: 1.4rem;
+    color: var(--color-accent-neon);
+    margin-bottom: 0.5rem;
+}
+
+/* --- FINAL CTA --- */
+#final-cta {
+    padding: 6rem 5%;
+    text-align: center;
+    background-color: var(--color-dark-bg);
+}
+#final-cta h2 {
+    color: var(--color-text-primary);
+    font-size: 3.5rem;
+    margin-bottom: 1.5rem;
+}
+
+#final-cta p {
+    font-size: 1.25rem; /* Make the text slightly larger */
+    margin-bottom: 3rem; /* Pushes the button down by 3rem */
+    color: var(--color-text-secondary);
+}
+
+.large-cta-btn {
+    font-size: 1.25rem;
+}
+
+/* --- BUTTON STYLING (The Shine) --- */
+.cta-button, .secondary-btn {
+    padding: 1rem 2.5rem;
+    text-decoration: none;
+    font-weight: 600;
+    text-transform: uppercase;
+    border-radius: 4px;
+    position: relative;
+    overflow: hidden; /* Critical for containing the visual shine */
+    z-index: 10;
+    transition: transform 0.2s, box-shadow 0.2s;
+    display: inline-block;
+}
+
+/* Primary Neon Shine Button */
+.primary-shiny-btn {
+    background: var(--color-accent-neon);
+    color: var(--color-dark-bg);
+    border: 2px solid var(--color-accent-neon);
+    box-shadow: 0 0 15px rgba(0, 255, 255, 0.5);
+}
+.primary-shiny-btn:hover {
+    transform: translateY(-2px) scale(1.02);
+    box-shadow: 0 0 30px rgba(0, 255, 255, 0.8), 0 0 5px rgba(0, 0, 0, 0.5);
+}
+
+/* Secondary Button (Outline/Inverse Look) */
+.secondary-btn {
+    background: transparent;
+    color: var(--color-accent-neon);
+    border: 2px solid var(--color-accent-neon);
+}
+.secondary-btn:hover {
+    background: rgba(0, 255, 255, 0.1);
+}
+
+/* --- Footer --- */
+#main-footer {
+    text-align: center;
+    padding: 2rem 5%;
+    font-size: 0.8rem;
+    color: var(--color-text-secondary);
+    border-top: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+/* --- New Rules for About Page (Add to styles.css) --- */
+
+/* Split Content Layout for Philosophy/Story section */
+.content-split-layout {
+    display: flex;
+    gap: 4rem;
+    max-width: 1200px;
+    margin: 4rem auto 0;
+    align-items: center;
+}
+.content-split-layout .split-text {
+    flex: 1;
+}
+.content-split-layout .split-visual {
+    flex: 1;
+}
+.content-split-layout h3 {
+    font-size: 2.5rem;
+    color: var(--color-text-primary);
+    margin-bottom: 1.5rem;
+}
+.content-split-layout p {
+    margin-bottom: 1.5rem;
+    color: var(--color-text-secondary);
+}
+
+/* Core Values List - Grid Layout */
+.value-pillars {
+    list-style: none;
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 2rem;
+    max-width: 1200px;
+    margin: 0 auto;
+    text-align: center;
+}
+.value-pillars li {
+    padding: 1.5rem;
+    border: 1px solid rgba(0, 255, 255, 0.1);
+    border-radius: 8px;
+    background-color: var(--color-dark-bg); /* Dark background for contrast */
+}
+
+/* Team Grid Layout */
+.team-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 3rem;
+    max-width: 1000px;
+    margin: 4rem auto 0;
+}
+.team-member {
+    text-align: center;
+}
+.team-member .headshot {
+    width: 100%;
+    max-width: 200px;
+    height: 200px;
+    object-fit: cover;
+    border-radius: 50%;
+    border: 3px solid var(--color-accent-neon);
+    margin-bottom: 1rem;
+}
+.team-member h4 {
+    color: var(--color-text-primary);
+    font-size: 1.5rem;
+    margin-bottom: 0.25rem;
+}
+.team-member .role {
+    color: var(--color-accent-neon);
+    font-weight: 600;
+    margin-bottom: 0.75rem;
+}
+.team-member .bio-snippet {
+    color: var(--color-text-secondary);
+    font-size: 0.9rem;
+}

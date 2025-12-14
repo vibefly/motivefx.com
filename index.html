@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>motiveFx | Creative Marketing. Digital Solutions.</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div id="vanta-bg"></div> <!-- VANTA background -->
+    <div id="wrapper">
+        
+        <header id="main-header">
+            <a href="#" class="logo">motiveFx</a>
+            <nav id="main-nav">
+                <ul>
+                    <li><a href="#services">Services</a></li>
+                    <li><a href="portfolio.html">Work</a></li>
+                    <li><a href="#about">About</a></li>
+                    <li><a href="contact.html">Contact Us</a></li>
+                </ul>
+            </nav>
+        </header>
+
+        <section id="hero" class="full-screen dark-bg">
+            <div id="hero-animation-canvas" class="eye-candy-bg"></div>
+
+            <div class="hero-content">
+                <p class="tagline">Creative Marketing. Digital Solutions.</p>
+                <h1>Media and software</br>to grow your business.</h1>
+                <p class="subtext">Graphics, storytelling, and digital tools to move your brand forward.</p>
+                <a href="contact.html" class="cta-button primary-shiny-btn">Lets go</a>
+            </div>
+        </section>
+
+        <section id="services" class="section-padding dark-bg">
+            <h2 class="section-headline">Our Services</h2>
+            <p class="section-subtext">We deliver high-impact results through a strategic blend of creative expertise and technical precision.</p>
+
+            <div class="pillars-container">
+
+                <div class="pillar card-effect-target">
+                    <h3>Web Development</h3>
+                    <p>Modern, fast, and scalable websites built to support marketing objectives and enhance user experience.</p>
+                </div>
+
+                <div class="pillar card-effect-target">
+                    <h3>Graphic Design</h3>
+                    <p>Brand visuals, marketing materials, and digital assets crafted with clarity, precision, and purpose.</p>
+                </div>
+
+                <div class="pillar card-effect-target">
+                    <h3>Photography</h3>
+                    <p>Studio and location photography that captures products, spaces, and stories with detail and intention.</p>
+                </div>
+
+                <div class="pillar card-effect-target">
+                    <h3>Video Production</h3>
+                    <p>Planning, shooting, and producing video content designed to elevate brand messaging and engagement.</p>
+                </div>
+
+                <div class="pillar card-effect-target">
+                    <h3>Post Production</h3>
+                    <p>Editing, color grading, animation, and motion graphics that bring visual projects to their final polished form.</p>
+                </div>
+
+                <div class="pillar card-effect-target">
+                    <h3>Software Integrations</h3>
+                    <p>Custom integrations and digital workflows engineered to streamline operations and improve business efficiency.</p>
+                </div>
+
+            </div>
+        </section>
+
+<section id="about" class="section-padding">
+    <h2 class="section-headline">Who We Are</h2>
+    <p class="section-subtext">
+        MotiveFX is a hybrid creative studio blending strategy, design, and technical expertise to help brands communicate better and work smarter.
+    </p>
+
+    <!-- Centering container -->
+    <div class="team-container">
+        <div class="team-member pillar">
+            <img src="images/headshot.jpg" alt="Eric McWeeney" class="headshot">
+            <h4>Eric McWeeney</h4>
+            <p class="role">Founder & Creative Director</p>
+            <p class="bio-snippet">
+                Eric has over 20 years of experience in creative direction, photography, video production, and software engineering. He combines creativity and technology to craft high-impact solutions for modern brands.
+            </p>
+        </div>
+    </div>
+</section>
+
+
+
+        
+        <section id="final-cta" class="full-width-cta dark-bg">
+            <h2>Ready to See Your Ideas Move Forward?</h2>
+            <p>Let's craft the perfect solution for your business needs and achieve definitive strategic results.</p>
+            <a href="contact.html" class="cta-button primary-shiny-btn large-cta-btn">Elevate My Brand</a>
+        </section>
+
+        <footer id="main-footer">
+            <p>&copy; 2025 motiveFx. All Rights Reserved. | Privacy Policy | Terms of Service</p>
+        </footer>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollToPlugin.min.js"></script>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r134/three.min.js"></script> 
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/vanta/0.5.24/vanta.min.js"></script> 
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/vanta/0.5.24/vanta.net.min.js"></script> 
+    
+    <script>
+VANTA.NET({
+    el: "#vanta-bg",
+    color: 0x1e90ff,
+    mouseControls: true,
+    touchControls: true,
+    gyroControls: false,
+    minHeight: 200.00,
+    minWidth: 200.00,
+    scale: 1.00,
+    scaleMobile: 1.00,
+    backgroundColor: 0x000000
+});
+    </script>
+    
+    <script src="js/animations.js" defer></script>
+</body>
+</html>
