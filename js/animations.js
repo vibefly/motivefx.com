@@ -1,9 +1,38 @@
 document.addEventListener('DOMContentLoaded', () => {
+    document.body.classList.remove('no-js');
     let morphController = null;
+    const heroCanvas = document.querySelector('#hero-animation-canvas');
+
+    const supportsWebGL = () => {
+        try {
+            const canvas = document.createElement('canvas');
+            return !!window.WebGLRenderingContext && (
+                canvas.getContext('webgl') || canvas.getContext('experimental-webgl')
+            );
+        } catch (err) {
+            return false;
+        }
+    };
+
+    const enableStaticBackground = () => {
+        document.body.classList.add('bg-fallback');
+        if (heroCanvas) {
+            heroCanvas.classList.add('static-bg');
+        }
+    };
+
+    const markAnimatedBackground = () => {
+        document.body.classList.add('bg-animated');
+        document.body.classList.remove('bg-fallback');
+        if (heroCanvas) {
+            heroCanvas.classList.remove('static-bg');
+        }
+    };
 
     const initMorphingDots = () => {
-        if (typeof MorphingDots === 'undefined' || typeof THREE === 'undefined') {
-            console.warn('MorphingDots requires THREE.js. Skipping morph animations.');
+        if (!supportsWebGL() || typeof MorphingDots === 'undefined' || typeof THREE === 'undefined') {
+            console.warn('MorphingDots requires THREE.js and WebGL. Falling back to static background.');
+            enableStaticBackground();
             return;
         }
 
@@ -11,10 +40,18 @@ document.addEventListener('DOMContentLoaded', () => {
             .getPropertyValue('--color-accent-neon')
             .trim() || '#f5ff1a';
 
-        morphController = new MorphingDots({
-            container: '#hero-animation-canvas',
-            pointColor: accentColor,
-        });
+        try {
+            morphController = new MorphingDots({
+                container: '#hero-animation-canvas',
+                pointColor: accentColor,
+            });
+            if (morphController) {
+                markAnimatedBackground();
+            }
+        } catch (err) {
+            console.error('Failed to initialize MorphingDots. Using static background.', err);
+            enableStaticBackground();
+        }
     };
 
     const morphToSectionShape = (hash) => {
@@ -41,7 +78,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const scrollToTop = () => {
             if (typeof gsap !== 'undefined' && typeof ScrollToPlugin !== 'undefined') {
                 gsap.to(window, {
-                    duration: 1.2,
+                    duration: 1.8,
                     scrollTo: 0,
                     ease: 'power2.inOut',
                 });
@@ -63,8 +100,62 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     };
 
+    const revealSectionsOnScroll = () => {
+        const revealTargets = document.querySelectorAll('section');
+        if (typeof IntersectionObserver === 'undefined' || !revealTargets.length) {
+            revealTargets.forEach(section => section.classList.add('section-visible'));
+            return;
+        }
+
+        const revealObserver = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                entry.target.classList.toggle('section-visible', entry.isIntersecting);
+            });
+        }, {
+            threshold: 0.25,
+        });
+
+        revealTargets.forEach(section => revealObserver.observe(section));
+    };
+
+    const observeSectionsOnScroll = () => {
+        const sections = document.querySelectorAll('[data-morph-shape]');
+        if (!sections.length || typeof IntersectionObserver === 'undefined') {
+            return;
+        }
+
+        let activeShape = null;
+        const observer = new IntersectionObserver((entries) => {
+            const visible = entries
+                .filter(entry => entry.isIntersecting)
+                .sort((a, b) => a.boundingClientRect.top - b.boundingClientRect.top);
+
+            if (!visible.length) {
+                return;
+            }
+
+            const candidate = visible[0].target;
+            const shape = candidate.dataset.morphShape;
+            if (shape && shape !== activeShape && morphController) {
+                activeShape = shape;
+                morphController.morphTo(shape);
+            }
+        }, {
+            threshold: 0.45,
+        });
+
+        sections.forEach(section => observer.observe(section));
+
+        const initialHash = window.location.hash;
+        if (initialHash) {
+            morphToSectionShape(initialHash);
+        }
+    };
+
     initMorphingDots();
     bindSectionClicks();
+    observeSectionsOnScroll();
+    revealSectionsOnScroll();
     
     // Check if GSAP and ScrollToPlugin are available (assumes they are linked in HTML)
     if (typeof gsap === 'undefined' || typeof ScrollToPlugin === 'undefined') {
@@ -100,7 +191,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         morphToSectionShape(hash);
                         // Use GSAP's ScrollToPlugin for a custom duration
                         gsap.to(window, {
-                            duration: 1.2, // **THIS CONTROLS THE SCROLL SPEED (1.2 seconds)**
+                            duration: 1.8, // slower scroll duration
                             scrollTo: targetElement,
                             ease: "power2.inOut", // Elegant easing function
                             onComplete: () => history.pushState(null, null, hash)
@@ -119,7 +210,7 @@ document.addEventListener('DOMContentLoaded', () => {
             y: 50,
             opacity: 0,
             stagger: 0.2,
-            duration: 1,
+            duration: 1.6,
             scrollTrigger: {
                 trigger: '#services',
                 start: "top 80%",

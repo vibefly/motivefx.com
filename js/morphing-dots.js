@@ -398,8 +398,8 @@
                 this.geometry.attributes.position.needsUpdate = true;
             }
 
-            this.autoRotation.y += delta * 0.05;
-            this.autoRotation.x += delta * 0.01;
+            this.autoRotation.y += delta * 0.08;
+            this.autoRotation.x += delta * 0.02;
             this.mouseRotation.currentX += (this.mouseRotation.targetX - this.mouseRotation.currentX) * 0.06;
             this.mouseRotation.currentY += (this.mouseRotation.targetY - this.mouseRotation.currentY) * 0.06;
 
