@@ -91,7 +91,7 @@ document.addEventListener('DOMContentLoaded', () => {
         };
 
         const logo = document.querySelector('#main-header .logo');
-        if (logo) {
+        if (logo && !logo.hasAttribute('data-link-only')) {
             logo.addEventListener('click', (e) => {
                 e.preventDefault();
                 scrollToTop();
