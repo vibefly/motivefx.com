@@ -67,6 +67,9 @@ document.addEventListener('DOMContentLoaded', () => {
     const bindSectionClicks = () => {
         const sections = document.querySelectorAll('[data-morph-shape]');
         sections.forEach(section => {
+            if (section.id === 'hero') {
+                return;
+            }
             section.addEventListener('click', () => {
                 const shape = section.dataset.morphShape;
                 if (shape && morphController) {
@@ -91,9 +94,6 @@ document.addEventListener('DOMContentLoaded', () => {
         if (logo) {
             logo.addEventListener('click', (e) => {
                 e.preventDefault();
-                if (morphController) {
-                    morphController.morphTo('scatter');
-                }
                 scrollToTop();
                 history.replaceState(null, null, window.location.pathname);
             });
