@@ -391,9 +391,10 @@
 
             if (this.targetPositions) {
                 const current = this.geometry.attributes.position.array;
+                const morphSpeed = 0.02;
                 for (let i = 0; i < current.length; i += 1) {
                     const target = this.targetPositions[i];
-                    current[i] += (target - current[i]) * 0.08;
+                    current[i] += (target - current[i]) * morphSpeed;
                 }
                 this.geometry.attributes.position.needsUpdate = true;
             }

@@ -218,16 +218,7 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
         
-        gsap.to('#hero-animation-canvas', {
-            yPercent: 10,
-            ease: "none",
-            scrollTrigger: {
-                trigger: 'body',
-                start: "top top",
-                end: "bottom top",
-                scrub: true,
-            }
-        });
+        // Removed previous hero parallax tweak; GSAP handles other scroll effects above.
     }
 
     // --- 3. Shiny Button and Background Placeholder functions remain below ---
