@@ -572,3 +572,9 @@ section {
         0 8px 25px rgba(60, 120, 255, 0.18),
         0 0 15px rgba(60, 120, 255, 0.2);
 }
+.section-fullscreen {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}

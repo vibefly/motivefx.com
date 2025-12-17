@@ -71,7 +71,7 @@
             </div>
         </section>
 
-<section id="about" class="section-padding" data-morph-shape="cube">
+<section id="about" class="section-padding section-fullscreen" data-morph-shape="cube">
     <h2 class="section-headline">Who We Are</h2>
     <p class="section-subtext">
         MotiveFX is a hybrid creative studio blending strategy, design, and technical expertise to help brands communicate better and work smarter.
@@ -98,8 +98,12 @@
                 action="https://formspree.io/f/mldqvzwg"
                 method="POST">
                 <div class="form-row">
-                    <label for="contact-name">Name</label>
-                    <input type="text" id="contact-name" name="name" placeholder="Your full name" required>
+                    <label for="contact-first-name">First Name</label>
+                    <input type="text" id="contact-first-name" name="first_name" placeholder="First name" required pattern="^[A-Za-z][A-Za-z\\s'-]{1,}$" title="Enter a valid first name.">
+                </div>
+                <div class="form-row">
+                    <label for="contact-last-name">Last Name</label>
+                    <input type="text" id="contact-last-name" name="last_name" placeholder="Last name" required pattern="^[A-Za-z][A-Za-z\\s'-]{1,}$" title="Enter a valid last name.">
                 </div>
                 <div class="form-row">
                     <label for="contact-company">Company</label>
