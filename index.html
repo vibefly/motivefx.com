@@ -82,9 +82,9 @@
         <div class="team-member pillar">
             <img src="images/headshot.jpg" alt="Eric McWeeney" class="headshot">
             <h4>Eric McWeeney</h4>
-            <p class="role">Founder & Creative Director</p>
+            <p class="role">Founder & Creative Technologist</p>
             <p class="bio-snippet">
-                Eric has over 20 years of experience in creative direction, photography, video production, and software engineering. He combines creativity and technology to craft high-impact solutions for modern business.
+                Eric has over 20 years of experience in software engineering and art direction. He combines creativity and technology to craft high-impact solutions for modern business.
             </p>
         </div>
     </div>
@@ -111,14 +111,7 @@
                 </div>
                 <div class="form-row">
                     <label for="contact-phone">Phone</label>
-                    <input
-                        type="tel"
-                        id="contact-phone"
-                        name="phone"
-                        placeholder="(555) 123-4567"
-                        required
-                        pattern="^\\+?[0-9\\s().-]{7,}$"
-                        title="Enter a valid phone number using digits with optional +, (), spaces, or dashes.">
+                    <input type="tel" id="contact-phone" name="phone" placeholder="(555) 123-4567" pattern="^\\+?[0-9\\s().-]{7,}$" title="Enter a valid phone number using digits with optional +, (), spaces, or dashes.">
                 </div>
                 <div class="form-row">
                     <label for="contact-email">Email</label>
@@ -126,7 +119,7 @@
                 </div>
                 <div class="form-row">
                     <label for="contact-message">Message</label>
-                    <textarea id="contact-message" name="message" rows="5" placeholder="What can we do for you?" required></textarea>
+                    <textarea id="contact-message" name="message" rows="5" placeholder="What can we do for you?" required pattern="^(?:(?!<|>|script|javascript:).)+$"></textarea>
                 </div>
                 <button type="submit" class="cta-button primary-shiny-btn cta-button--wide">Inquire</button>
             </form>
