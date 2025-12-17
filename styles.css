@@ -66,6 +66,12 @@ section {
     transform: translateY(40px);
     transition: opacity 0.9s ease, transform 0.9s ease;
 }
+
+body.no-js section,
+body.bg-fallback section {
+    opacity: 1;
+    transform: none;
+}
 .section-subtext {
     max-width: 800px;
     margin: 0 auto 4rem;
