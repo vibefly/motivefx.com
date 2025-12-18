@@ -124,6 +124,39 @@ body.static-page section {
 }
 #main-nav a:hover { color: var(--color-accent-neon); }
 
+.nav-toggle {
+    display: none;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 0.3rem;
+    border: 1px solid rgba(255,255,255,0.3);
+    background: transparent;
+    color: var(--color-text-primary);
+    padding: 0.5rem;
+    border-radius: 4px;
+}
+.nav-toggle:focus-visible {
+    outline: 2px solid var(--color-accent-neon);
+    outline-offset: 2px;
+}
+.nav-toggle-bar {
+    display: block;
+    width: 20px;
+    height: 2px;
+    background: var(--color-text-primary);
+}
+.sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    border: 0;
+}
+
 #main-nav .nav-shiny-btn {
     /* Pushes the button up just enough to visually align its text baseline
        with the text links, compensating for its padding */
@@ -602,17 +635,39 @@ body.static-page section {
     }
     #main-header {
         padding: 1rem 6%;
+        position: relative;
+    }
+    .nav-toggle {
+        display: inline-flex;
+        margin-left: auto;
+    }
+    #main-nav {
+        display: none;
+        position: absolute;
+        top: 100%;
+        left: 0;
+        width: 100%;
+        background: rgba(0, 0, 0, 0.95);
+        border-top: 1px solid rgba(255, 255, 255, 0.1);
+        padding: 0.5rem 6%;
+        margin-top: 0.5rem;
+        z-index: 100;
+    }
+    #main-nav.is-open {
+        display: block;
     }
     #main-nav ul {
-        flex-wrap: wrap;
-        justify-content: flex-start;
-        gap: 1rem;
+        flex-direction: column;
+        width: 100%;
+        gap: 0;
     }
     #main-nav li {
-        flex: 0 0 auto;
+        width: 100%;
+        text-align: left;
     }
     #main-nav a {
-        padding: 0.35rem 0;
+        display: block;
+        padding: 0.75rem 0;
     }
     .hero-content {
         padding-top: 6rem;

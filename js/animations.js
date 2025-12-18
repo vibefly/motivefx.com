@@ -100,6 +100,25 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     };
 
+    const initNavToggle = () => {
+        const navToggle = document.querySelector('.nav-toggle');
+        const mainNav = document.querySelector('#main-nav');
+        if (!navToggle || !mainNav) {
+            return;
+        }
+        navToggle.addEventListener('click', () => {
+            const expanded = navToggle.getAttribute('aria-expanded') === 'true';
+            navToggle.setAttribute('aria-expanded', (!expanded).toString());
+            mainNav.classList.toggle('is-open');
+        });
+        mainNav.querySelectorAll('a').forEach(link => {
+            link.addEventListener('click', () => {
+                navToggle.setAttribute('aria-expanded', 'false');
+                mainNav.classList.remove('is-open');
+            });
+        });
+    };
+
     const revealSectionsOnScroll = () => {
         const revealTargets = document.querySelectorAll('section');
         if (typeof IntersectionObserver === 'undefined' || !revealTargets.length) {
@@ -156,6 +175,7 @@ document.addEventListener('DOMContentLoaded', () => {
     bindSectionClicks();
     observeSectionsOnScroll();
     revealSectionsOnScroll();
+    initNavToggle();
     
     // Check if GSAP and ScrollToPlugin are available (assumes they are linked in HTML)
     if (typeof gsap === 'undefined' || typeof ScrollToPlugin === 'undefined') {
