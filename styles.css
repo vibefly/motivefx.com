@@ -285,7 +285,6 @@ body.static-page section {
     display: flex;
     justify-content: center;  /* centers horizontally */
     width: 100%;
-    margin: 2rem auto 0;
 }
 
 /* Pillar card styling remains the same */
