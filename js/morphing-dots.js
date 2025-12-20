@@ -430,7 +430,7 @@
 
         _updateAnimatedShapes(delta) {
             if (this.activeShape === 'wave') {
-                this.wavePhase += delta * 1.4;
+                this.wavePhase += delta * 0.4; // even slower wave animation
                 this.shapes.wave = this._generateWavePositions(this.wavePhase);
                 this.targetPositions = this.shapes.wave;
             }
