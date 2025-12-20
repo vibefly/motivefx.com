@@ -35,6 +35,9 @@
 
             this.particleCount = this.config.particleCount;
             this.targetPositions = null;
+            this.activeShape = null;
+            this.wavePhase = 0;
+            this.spherePhase = 0;
             this.resizeObserver = null;
             this.clock = new THREE.Clock();
 
@@ -135,9 +138,9 @@
         _buildShapeLibrary() {
             this.shapes = {
                 grid: this._generateGridPositions(),
-                sphere: this._generateSpherePositions(),
+                sphere: this._generateSpherePositions(0),
                 helix: this._generateHelixPositions(),
-                wave: this._generateWavePositions(),
+                wave: this._generateWavePositions(0),
                 spiralshell: this._generateSpiralShellPositions(),
                 envelope: this._generateEnvelopePositions(),
                 cube: this._generateCubePositions(),
@@ -158,6 +161,7 @@
         morphTo(shapeName) {
             if (shapeName === 'scatter') {
                 this.targetPositions = this._generateScatterPositions();
+                this.activeShape = shapeName;
                 return;
             }
             if (!this.shapes || !this.shapes[shapeName]) {
@@ -165,9 +169,17 @@
                 return;
             }
             if (this.targetPositions === this.shapes[shapeName]) {
+                this.activeShape = shapeName;
                 return;
             }
+            this.activeShape = shapeName;
             this.targetPositions = this.shapes[shapeName];
+            if (shapeName === 'wave') {
+                this.wavePhase = 0;
+            }
+            if (shapeName === 'sphere') {
+                this.spherePhase = 0;
+            }
         }
 
         dispose() {
@@ -208,7 +220,7 @@
             return positions;
         }
 
-        _generateSpherePositions() {
+        _generateSpherePositions(phase = 0) {
             const positions = new Float32Array(this.particleCount * 3);
             const radius = 50;
             const offset = 2 / this.particleCount;
@@ -218,9 +230,11 @@
                 const y = i * offset - 1 + offset / 2;
                 const r = Math.sqrt(1 - y * y);
                 const phi = i * increment;
-                positions[i * 3] = Math.cos(phi) * r * radius;
-                positions[i * 3 + 1] = y * radius;
-                positions[i * 3 + 2] = Math.sin(phi) * r * radius;
+                const ripple = Math.sin(phi * 0.8 + phase) * 3 + Math.cos(y * 6 + phase * 1.3) * 2;
+                const effectiveRadius = radius + ripple;
+                positions[i * 3] = Math.cos(phi) * r * effectiveRadius;
+                positions[i * 3 + 1] = y * effectiveRadius;
+                positions[i * 3 + 2] = Math.sin(phi) * r * effectiveRadius;
             }
             return positions;
         }
@@ -241,7 +255,7 @@
             return positions;
         }
 
-        _generateWavePositions() {
+        _generateWavePositions(phase = 0) {
             const positions = new Float32Array(this.particleCount * 3);
             const columns = Math.round(Math.sqrt(this.particleCount));
             const rows = Math.ceil(this.particleCount / columns);
@@ -255,7 +269,7 @@
                 const zRatio = row / (rows - 1) - 0.5;
                 const x = xRatio * width;
                 const z = zRatio * depth;
-                const y = Math.sin(xRatio * Math.PI * 4) * 12 + Math.cos(zRatio * Math.PI * 4) * 12;
+                const y = Math.sin(xRatio * Math.PI * 4 + phase) * 12 + Math.cos(zRatio * Math.PI * 4 + phase * 0.7) * 12;
                 positions[i * 3] = x;
                 positions[i * 3 + 1] = y;
                 positions[i * 3 + 2] = z;
@@ -389,6 +403,8 @@
             requestAnimationFrame(this._animate);
             const delta = this.clock.getDelta();
 
+            this._updateAnimatedShapes(delta);
+
             if (this.targetPositions) {
                 const current = this.geometry.attributes.position.array;
                 const morphSpeed = 0.07; // slightly faster interpolation toward target shape
@@ -410,6 +426,19 @@
             }
 
             this.renderer.render(this.scene, this.camera);
+        }
+
+        _updateAnimatedShapes(delta) {
+            if (this.activeShape === 'wave') {
+                this.wavePhase += delta * 1.4;
+                this.shapes.wave = this._generateWavePositions(this.wavePhase);
+                this.targetPositions = this.shapes.wave;
+            }
+            if (this.activeShape === 'sphere') {
+                this.spherePhase += delta * 1.2;
+                this.shapes.sphere = this._generateSpherePositions(this.spherePhase);
+                this.targetPositions = this.shapes.sphere;
+            }
         }
 
         _bindResize() {
