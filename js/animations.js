@@ -227,10 +227,9 @@ document.addEventListener('DOMContentLoaded', () => {
         
         // (Existing GSAP parallax and stagger code for the sections)
         gsap.from('.pillar', {
-            y: 50,
             opacity: 0,
             stagger: 0.2,
-            duration: 1.6,
+            duration: 1,
             scrollTrigger: {
                 trigger: '#services',
                 start: "top 80%",

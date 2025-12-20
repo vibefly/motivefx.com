@@ -618,9 +618,6 @@ body.static-page section {
     .hero-content {
         padding-top: 3rem;
     }
-    .pillars-container {
-        grid-template-columns: 1fr 1fr;
-    }
     .value-propositions {
         grid-template-columns: repeat(2, 1fr);
     }
@@ -676,7 +673,6 @@ body.static-page section {
         padding-left: 1.5rem;
         padding-right: 1.5rem;
     }
-    .pillars-container,
     .value-propositions,
     .value-pillars,
     .team-grid,
