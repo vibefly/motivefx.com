@@ -610,7 +610,11 @@ body.static-page section {
     }
     #main-header {
         padding: 1rem 6%;
-        position: relative;
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        z-index: 1000;
     }
     .nav-toggle {
         display: inline-flex;
