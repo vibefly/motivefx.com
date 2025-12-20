@@ -37,7 +37,6 @@
             this.targetPositions = null;
             this.activeShape = null;
             this.wavePhase = 0;
-            this.spherePhase = 0;
             this.resizeObserver = null;
             this.clock = new THREE.Clock();
 
@@ -138,7 +137,7 @@
         _buildShapeLibrary() {
             this.shapes = {
                 grid: this._generateGridPositions(),
-                sphere: this._generateSpherePositions(0),
+                sphere: this._generateSpherePositions(),
                 helix: this._generateHelixPositions(),
                 wave: this._generateWavePositions(0),
                 spiralshell: this._generateSpiralShellPositions(),
@@ -176,9 +175,6 @@
             this.targetPositions = this.shapes[shapeName];
             if (shapeName === 'wave') {
                 this.wavePhase = 0;
-            }
-            if (shapeName === 'sphere') {
-                this.spherePhase = 0;
             }
         }
 
@@ -220,9 +216,9 @@
             return positions;
         }
 
-        _generateSpherePositions(phase = 0) {
+        _generateSpherePositions() {
             const positions = new Float32Array(this.particleCount * 3);
-            const radius = 50;
+            const radius = 60;
             const offset = 2 / this.particleCount;
             const increment = Math.PI * (3 - Math.sqrt(5));
 
@@ -230,11 +226,9 @@
                 const y = i * offset - 1 + offset / 2;
                 const r = Math.sqrt(1 - y * y);
                 const phi = i * increment;
-                const ripple = Math.sin(phi * 0.8 + phase) * 3 + Math.cos(y * 6 + phase * 1.3) * 2;
-                const effectiveRadius = radius + ripple;
-                positions[i * 3] = Math.cos(phi) * r * effectiveRadius;
-                positions[i * 3 + 1] = y * effectiveRadius;
-                positions[i * 3 + 2] = Math.sin(phi) * r * effectiveRadius;
+                positions[i * 3] = Math.cos(phi) * r * radius;
+                positions[i * 3 + 1] = y * radius;
+                positions[i * 3 + 2] = Math.sin(phi) * r * radius;
             }
             return positions;
         }
@@ -433,11 +427,6 @@
                 this.wavePhase += delta * 0.4; // even slower wave animation
                 this.shapes.wave = this._generateWavePositions(this.wavePhase);
                 this.targetPositions = this.shapes.wave;
-            }
-            if (this.activeShape === 'sphere') {
-                this.spherePhase += delta * 1.2;
-                this.shapes.sphere = this._generateSpherePositions(this.spherePhase);
-                this.targetPositions = this.shapes.sphere;
             }
         }
 
