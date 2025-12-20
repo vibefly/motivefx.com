@@ -216,7 +216,7 @@ body.static-page section {
 /* --- PILLARS / Services --- */
 .pillars-container {
     display: grid;
-    grid-template-columns: repeat(2, 1fr);
+    grid-template-columns: repeat(auto-fit, minmax(380px, 1fr));
     gap: 3rem;
     max-width: 1200px;
     margin: 0 auto;
@@ -234,25 +234,7 @@ body.static-page section {
 }
 
 .pillar::after {
-    content: '';
-    position: absolute;
-    inset: 0;
-    border-radius: inherit;
-    padding: 1px;
-    background: linear-gradient(120deg,
-        rgba(60,120,255,0.05),
-        rgba(60,180,255,0.3),
-        rgba(60,120,255,0.05));
-    background-size: 200% 200%;
-    opacity: 0;
-    transition: opacity 0.6s ease;
-    pointer-events: none;
-    z-index: 1;
-    -webkit-mask:
-        linear-gradient(#000 0 0) content-box,
-        linear-gradient(#000 0 0);
-    -webkit-mask-composite: xor;
-    mask-composite: exclude;
+    content: none; /* remove shine border */
 }
 
 .pillar::before {
@@ -283,11 +265,6 @@ body.static-page section {
 
 .pillar:hover::before {
     transform: rotate(25deg) translateX(170%);
-}
-
-.pillar:hover::after {
-    opacity: 0.6;
-    animation: borderShineSweep 3s linear infinite;
 }
 
 .pillar h3 {
@@ -350,11 +327,6 @@ body.static-page section {
     box-shadow:
         0 8px 25px rgba(60, 120, 255, 0.18),
         0 0 15px rgba(60, 120, 255, 0.2);
-}
-
-.team-member.pillar:hover::after {
-    opacity: 0.6;
-    animation: borderShineSweep 3s linear infinite;
 }
 
 .team-member.pillar:hover::before {
@@ -630,6 +602,12 @@ body.static-page section {
     h1 {
         font-size: 2.8rem;
     }
+    section,
+    .section-padding {
+        opacity: 1;
+        transform: none;
+        transition: none;
+    }
     #main-header {
         padding: 1rem 6%;
         position: relative;
@@ -677,6 +655,9 @@ body.static-page section {
     .value-pillars,
     .team-grid,
     .team-container {
+        grid-template-columns: 1fr;
+    }
+    .pillars-container {
         grid-template-columns: 1fr;
     }
     .team-grid {
