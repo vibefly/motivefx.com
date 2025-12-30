@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Audio Fireworks Visualization</title>
+    <link rel="stylesheet" href="visualization.css">
+</head>
+<body>
+    <div id="overlay">
+        <h1>Audio Reactive Fireworks</h1>
+        <p>Click start, allow microphone access, and play some bass-heavy audio. Bass hits trigger bursts.</p>
+        <div id="buttons">
+            <button id="start-btn">Start Audio</button>
+            <button id="test-burst-btn">Test Burst</button>
+        </div>
+        <div id="status">Idle</div>
+        <div id="controls">
+            <label for="threshold">Sensitivity: <span id="threshold-value"></span></label>
+            <input type="range" id="threshold" min="5" max="200" value="100" />
+            <div id="meter">
+                <div id="meter-fill"></div>
+            </div>
+            <div id="meter-label">Input level: <span id="meter-value">0</span></div>
+        </div>
+    </div>
+    <canvas id="vis-canvas"></canvas>
+
+    <script src="js/three.min.r134.js"></script>
+    <script src="js/visualization.js"></script>
+</body>
+</html>
