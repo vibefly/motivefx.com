@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lumen Garden | motiveFx</title>
+    <style>
+        html, body {
+            margin: 0;
+            height: 100%;
+            background: #000;
+            overflow: hidden;
+            font-family: "Avenir Next", "Segoe UI", system-ui, -apple-system, sans-serif;
+            color: #e7f8ff;
+        }
+
+        canvas {
+            display: block;
+        }
+
+        .overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            padding: 24px;
+            pointer-events: none;
+            background: linear-gradient(180deg, rgba(0, 0, 0, 0.45), rgba(0, 0, 0, 0));
+        }
+
+        .title {
+            font-size: clamp(20px, 3vw, 28px);
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            color: #8ae1ff;
+            margin: 0 0 6px 0;
+        }
+
+        .subtitle {
+            margin: 0;
+            font-size: clamp(14px, 2.5vw, 18px);
+            color: #b8e7ff;
+        }
+    </style>
+</head>
+<body>
+    <div class="overlay">
+        <p class="title">Lumen Garden</p>
+        <p class="subtitle">Floating light-vines weaving through a quiet night field.</p>
+    </div>
+
+    <script src="js/three.min.r134.js"></script>
+    <script>
+        const scene = new THREE.Scene();
+        scene.fog = new THREE.FogExp2(0x000000, 0.05);
+
+        const camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.1, 100);
+        camera.position.set(0, 1.5, 6);
+
+        const renderer = new THREE.WebGLRenderer({ antialias: true });
+        renderer.setPixelRatio(window.devicePixelRatio);
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        renderer.setClearColor(0x000000, 1);
+        document.body.appendChild(renderer.domElement);
+
+        const ambient = new THREE.AmbientLight(0x335577, 0.6);
+        scene.add(ambient);
+
+        const moon = new THREE.PointLight(0x66ccff, 2, 20);
+        moon.position.set(-4, 3, 2);
+        scene.add(moon);
+
+        const groundGeo = new THREE.PlaneGeometry(50, 50, 1, 1);
+        const groundMat = new THREE.MeshBasicMaterial({ color: 0x05080c, opacity: 0.6, transparent: true });
+        const ground = new THREE.Mesh(groundGeo, groundMat);
+        ground.rotation.x = -Math.PI / 2;
+        ground.position.y = -0.75;
+        scene.add(ground);
+
+        // Stars
+        const starCount = 800;
+        const starPositions = new Float32Array(starCount * 3);
+        for (let i = 0; i < starCount; i++) {
+            const i3 = i * 3;
+            starPositions[i3] = (Math.random() - 0.5) * 40;
+            starPositions[i3 + 1] = Math.random() * 20 + 2;
+            starPositions[i3 + 2] = (Math.random() - 0.5) * 40;
+        }
+        const stars = new THREE.Points(
+            new THREE.BufferGeometry().setAttribute("position", new THREE.BufferAttribute(starPositions, 3)),
+            new THREE.PointsMaterial({ color: 0x88ccff, size: 0.03, transparent: true, opacity: 0.8, depthWrite: false })
+        );
+        scene.add(stars);
+
+        const ribbonCount = 18;
+        const segments = 80;
+        const ribbons = [];
+
+        function createRibbon(idx) {
+            const anchors = [];
+            for (let i = 0; i < 5; i++) {
+                anchors.push(new THREE.Vector3(
+                    (Math.random() - 0.5) * 2.5,
+                    i * 0.5 - 1.2,
+                    (Math.random() - 0.5) * 2.5
+                ));
+            }
+
+            const curve = new THREE.CatmullRomCurve3(anchors);
+            curve.curveType = "centripetal";
+            curve.tension = 0.65;
+
+            const positions = new Float32Array((segments + 1) * 3);
+            const geometry = new THREE.BufferGeometry();
+            geometry.setAttribute("position", new THREE.BufferAttribute(positions, 3));
+
+            const material = new THREE.LineBasicMaterial({
+                color: new THREE.Color().setHSL(idx / ribbonCount, 0.6, 0.6),
+                transparent: true,
+                opacity: 0.9,
+                linewidth: 2
+            });
+
+            const line = new THREE.Line(geometry, material);
+            line.position.x = (Math.random() - 0.5) * 6;
+            line.position.z = (Math.random() - 0.5) * 6;
+            scene.add(line);
+
+            const phase = Math.random() * Math.PI * 2;
+            const speed = 0.3 + Math.random() * 0.4;
+
+            return { line, curve, anchors, positions, material, phase, speed };
+        }
+
+        for (let i = 0; i < ribbonCount; i++) {
+            ribbons.push(createRibbon(i));
+        }
+
+        const clock = new THREE.Clock();
+
+        function updateRibbon(ribbon, elapsed) {
+            const { curve, anchors, positions, line, material, phase, speed } = ribbon;
+
+            for (let i = 0; i < anchors.length; i++) {
+                const a = anchors[i];
+                const t = elapsed * speed + phase + i * 0.6;
+                a.x = Math.sin(t * 0.6) * 1.6 + Math.sin(t * 1.3) * 0.35;
+                a.z = Math.cos(t * 0.7) * 1.6 + Math.cos(t * 1.1) * 0.35;
+                a.y = i * 0.45 - 1.3 + Math.sin(t * 0.9) * 0.35;
+            }
+
+            curve.points = anchors;
+            const posAttr = line.geometry.attributes.position;
+            for (let s = 0; s <= segments; s++) {
+                const t = s / segments;
+                const p = curve.getPoint(t);
+                const i3 = s * 3;
+                positions[i3] = p.x;
+                positions[i3 + 1] = p.y;
+                positions[i3 + 2] = p.z;
+            }
+            posAttr.needsUpdate = true;
+
+            const hue = (phase * 0.05 + elapsed * 0.02) % 1;
+            material.color.setHSL(hue, 0.7, 0.55);
+            material.opacity = 0.6 + Math.sin(elapsed * 0.8 + phase) * 0.2;
+        }
+
+        function animate() {
+            requestAnimationFrame(animate);
+            const elapsed = clock.getElapsedTime();
+
+            ribbons.forEach(r => updateRibbon(r, elapsed));
+            stars.rotation.y += 0.0008;
+
+            camera.position.x = Math.sin(elapsed * 0.15) * 0.8;
+            camera.position.z = 6 + Math.sin(elapsed * 0.08) * 0.6;
+            camera.lookAt(0, 0, 0);
+
+            renderer.render(scene, camera);
+        }
+
+        function onResize() {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        }
+
+        window.addEventListener("resize", onResize);
+        animate();
+    </script>
+</body>
+</html>
