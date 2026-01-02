@@ -166,11 +166,6 @@
                 const bulgeWave = Math.sin(time * speed + along * 14 + phase) * 0.8 +
                                   Math.sin(time * 1.8 + along * 24 + phase * 1.2) * 0.55;
                 const bulge = 1 + bulgeWave * 0.55; // bigger swell than base
-                // Taper near start/end so tips disappear off-screen instead of showing broken geometry
-                const taperStart = Math.min(1, along * 2.5);
-                const taperEnd = Math.min(1, (1 - along) * 3);
-                const taper = Math.min(taperStart, taperEnd);
-                const radiusScale = Math.max(0, 1 + (bulge - 1) * taper);
 
                 const baseX = basePositions[i];
                 const baseY = basePositions[i + 1];
@@ -180,9 +175,9 @@
                 const nY = normals[i + 1];
                 const nZ = normals[i + 2];
 
-                positions[i]     = baseX + nX * baseRadius * (radiusScale - 1);
-                positions[i + 1] = baseY + nY * baseRadius * (radiusScale - 1);
-                positions[i + 2] = baseZ + nZ * baseRadius * (radiusScale - 1);
+                positions[i]     = baseX + nX * baseRadius * (bulge - 1);
+                positions[i + 1] = baseY + nY * baseRadius * (bulge - 1);
+                positions[i + 2] = baseZ + nZ * baseRadius * (bulge - 1);
             }
 
             posAttr.needsUpdate = true;
