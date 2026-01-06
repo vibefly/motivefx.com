@@ -1,0 +1,30 @@
+<svg width="480" height="300" viewBox="0 0 480 300" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="lg-bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#06233b" />
+      <stop offset="100%" stop-color="#0a101a" />
+    </linearGradient>
+    <radialGradient id="lg-glow" cx="40%" cy="35%" r="60%">
+      <stop offset="0%" stop-color="#7cf0ff" stop-opacity="0.6" />
+      <stop offset="100%" stop-color="transparent" />
+    </radialGradient>
+  </defs>
+  <rect width="480" height="300" fill="url(#lg-bg)" />
+  <rect width="480" height="300" fill="url(#lg-glow)" />
+  <g stroke="#7cf0ff" stroke-opacity="0.35" stroke-width="3" fill="none">
+    <path d="M60 250 Q160 180 220 210 T340 220 T440 180" />
+    <path d="M50 200 Q120 150 200 180 T320 150 T430 200" />
+  </g>
+  <g fill="#9bf7ff" opacity="0.9">
+    <circle cx="90" cy="210" r="6" />
+    <circle cx="190" cy="190" r="5" />
+    <circle cx="280" cy="205" r="7" />
+    <circle cx="360" cy="185" r="6" />
+    <circle cx="420" cy="195" r="5" />
+  </g>
+  <g fill="#7cf0ff" opacity="0.35">
+    <circle cx="140" cy="120" r="26" />
+    <circle cx="320" cy="90" r="22" />
+    <circle cx="250" cy="70" r="18" />
+  </g>
+</svg>

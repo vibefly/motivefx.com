@@ -1,0 +1,20 @@
+<svg width="480" height="300" viewBox="0 0 480 300" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="vanta-bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#05070d" />
+      <stop offset="100%" stop-color="#0f1a2c" />
+    </linearGradient>
+  </defs>
+  <rect width="480" height="300" fill="url(#vanta-bg)" />
+  <g fill="none" stroke="#3c78ff" stroke-opacity="0.5" stroke-width="1.4">
+    <path d="M40 220 L120 160 L220 210 L310 140 L420 200" />
+    <path d="M80 120 L150 190 L240 130 L330 210 L400 140" />
+  </g>
+  <g fill="#f5ff1a" opacity="0.9">
+    <circle cx="120" cy="160" r="4" />
+    <circle cx="220" cy="210" r="4" />
+    <circle cx="310" cy="140" r="4" />
+    <circle cx="330" cy="210" r="4" />
+    <circle cx="150" cy="190" r="3.5" />
+  </g>
+</svg>

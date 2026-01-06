@@ -1,0 +1,23 @@
+<svg width="480" height="300" viewBox="0 0 480 300" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="ico-bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0d101c" />
+      <stop offset="100%" stop-color="#05060c" />
+    </linearGradient>
+    <linearGradient id="ico-line" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#3c78ff" />
+      <stop offset="100%" stop-color="#7cf0ff" />
+    </linearGradient>
+  </defs>
+  <rect width="480" height="300" fill="url(#ico-bg)" />
+  <g fill="none" stroke="url(#ico-line)" stroke-width="2.2">
+    <polygon points="240,70 320,110 320,200 240,240 160,200 160,110" />
+    <polygon points="240,70 240,150 160,110" />
+    <polygon points="240,70 240,150 320,110" />
+    <polygon points="160,110 240,150 160,200" />
+    <polygon points="320,110 240,150 320,200" />
+    <polygon points="160,200 240,150 240,240" />
+    <polygon points="320,200 240,150 240,240" />
+  </g>
+  <circle cx="240" cy="150" r="6" fill="#f5ff1a" />
+</svg>

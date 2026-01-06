@@ -1,0 +1,25 @@
+<svg width="480" height="300" viewBox="0 0 480 300" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <radialGradient id="rbaf-bg" cx="50%" cy="50%" r="75%">
+      <stop offset="0%" stop-color="#0a0f1c" />
+      <stop offset="100%" stop-color="#020308" />
+    </radialGradient>
+    <linearGradient id="rbaf-lines" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#00f0ff" />
+      <stop offset="50%" stop-color="#ff47c2" />
+      <stop offset="100%" stop-color="#f5ff1a" />
+    </linearGradient>
+  </defs>
+  <rect width="480" height="300" fill="url(#rbaf-bg)" />
+  <g fill="none" stroke="url(#rbaf-lines)" stroke-width="2" opacity="0.95">
+    <path d="M30 150 Q240 70 450 150" />
+    <path d="M30 185 Q240 120 450 185" />
+    <path d="M30 220 Q240 170 450 220" />
+  </g>
+  <g stroke="#00f0ff" stroke-opacity="0.35" fill="none" stroke-dasharray="6 6">
+    <circle cx="240" cy="150" r="42" />
+    <circle cx="240" cy="150" r="86" />
+    <circle cx="240" cy="150" r="130" />
+  </g>
+  <circle cx="240" cy="150" r="9" fill="#f5ff1a" />
+</svg>

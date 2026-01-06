@@ -226,10 +226,10 @@ body.static-page section {
     position: relative;
     overflow: hidden;
     background-color: var(--color-light-bg);
-    border: 1px solid rgba(60, 120, 255, 0.35);
+    border: 1px solid rgba(122, 215, 255, 0.55);
     padding: 3rem;
     border-radius: 12px;
-    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.5);
+    box-shadow: none;
     transition: transform var(--transition-speed), box-shadow var(--transition-speed);
 }
 
@@ -257,10 +257,13 @@ body.static-page section {
 
 .pillar:hover {
     transform: translateY(-4px);
-    border-color: rgba(60, 120, 255, 0.35); /* keep hover border subtle */
-    box-shadow:
-        0 8px 22px rgba(60, 120, 255, 0.16),
-        0 0 12px rgba(60, 120, 255, 0.16); /* softer glow */
+    border-color: rgba(0, 220, 255, 0.9); /* brighter cyan hover */
+    box-shadow: none; /* remove hover glow/dropshadow */
+}
+
+.card:hover {
+    border-color: rgba(0, 220, 255, 0.9);
+    box-shadow: none;
 }
 
 .pillar:hover::before {
@@ -272,6 +275,67 @@ body.static-page section {
     color: var(--color-accent-neon);
     margin-bottom: 1rem;
 }
+
+.card {
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+    padding: 2.25rem;
+    min-height: 340px;
+    border: 1px solid rgba(122, 215, 255, 0.55);
+    border-radius: 12px;
+    background:
+        linear-gradient(135deg, rgba(122, 215, 255, 0.18), rgba(117, 82, 255, 0.16)),
+        radial-gradient(60% 60% at 30% 30%, rgba(255, 255, 255, 0.12), transparent 60%),
+        linear-gradient(135deg, rgba(8, 12, 24, 0.95), rgba(5, 8, 20, 0.9));
+    color: var(--color-text-primary);
+    box-shadow: none;
+    transition: transform var(--transition-speed), box-shadow var(--transition-speed), border-color var(--transition-speed);
+    position: relative;
+}
+
+.study-body {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    flex: 1;
+}
+
+.study-body h3 {
+    margin: 0;
+    font-size: 1.65rem;
+    color: var(--color-accent-neon);
+}
+
+.study-body p {
+    margin: 0;
+    color: var(--color-text-secondary);
+}
+
+.card::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(180deg, rgba(5, 8, 20, 0.82) 0%, rgba(5, 8, 20, 0.72) 45%, rgba(5, 8, 20, 0.9) 100%);
+    pointer-events: none;
+}
+
+.study-body {
+    position: relative;
+    z-index: 1;
+}
+
+.study-link {
+    width: 100%;
+    justify-content: center;
+    text-align: center;
+    margin-top: 0.5rem;
+    padding: 0.8rem 1.5rem;
+    font-size: 0.95rem;
+    letter-spacing: 0.08em;
+    border-radius: 10px;
+}
+
 .pillar-link {
     display: block;
     margin-top: 1.5rem;
@@ -358,6 +422,7 @@ body.static-page section {
     color: var(--color-text-secondary);
     font-size: 0.95rem;
 }
+
 
 .value-propositions {
     list-style: none;

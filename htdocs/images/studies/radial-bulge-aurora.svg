@@ -1,0 +1,25 @@
+<svg width="480" height="300" viewBox="0 0 480 300" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <radialGradient id="rba-bg" cx="50%" cy="50%" r="75%">
+      <stop offset="0%" stop-color="#0a1221" />
+      <stop offset="100%" stop-color="#03060d" />
+    </radialGradient>
+    <linearGradient id="rba-lines" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#35ffd2" />
+      <stop offset="50%" stop-color="#00c6ff" />
+      <stop offset="100%" stop-color="#f5ff1a" />
+    </linearGradient>
+  </defs>
+  <rect width="480" height="300" fill="url(#rba-bg)" />
+  <g fill="none" stroke="url(#rba-lines)" stroke-width="2.2" opacity="0.92">
+    <path d="M40 150 Q240 80 440 150" />
+    <path d="M40 180 Q240 120 440 180" />
+    <path d="M40 210 Q240 150 440 210" />
+  </g>
+  <g fill="none" stroke="#35ffd2" stroke-opacity="0.35">
+    <circle cx="240" cy="150" r="50" />
+    <circle cx="240" cy="150" r="95" />
+    <circle cx="240" cy="150" r="135" />
+  </g>
+  <circle cx="240" cy="150" r="9" fill="#f5ff1a" />
+</svg>

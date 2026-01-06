@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Radial Bulge Aurora | motiveFx</title>
+    <link rel="stylesheet" href="styles.css">
     <style>
         html, body {
             margin: 0;
@@ -20,7 +21,7 @@
 
         .overlay {
             position: fixed;
-            top: 0;
+            top: 96px;
             left: 0;
             width: 100%;
             padding: 22px;
@@ -43,7 +44,25 @@
         }
     </style>
 </head>
-<body>
+<body class="static-page vis-page">
+    <header id="main-header">
+        <a href="index.html" class="logo">motiveFx</a>
+        <button class="nav-toggle" aria-expanded="false" aria-controls="main-nav">
+            <span class="sr-only">Toggle navigation</span>
+            <span class="nav-toggle-bar"></span>
+            <span class="nav-toggle-bar"></span>
+            <span class="nav-toggle-bar"></span>
+        </button>
+        <nav id="main-nav">
+            <ul>
+                <li><a href="index.html#about">About</a></li>
+                <li><a href="index.html#services">Services</a></li>
+                <li><a href="studies.html">Studies</a></li>
+                <li><a href="index.html#contact">Contact</a></li>
+            </ul>
+        </nav>
+    </header>
+
     <div class="overlay">
         <p class="title">Radial Bulge Aurora</p>
         <p class="subtitle">Thick, breathing strands pulse from the core and drift outward.</p>
@@ -213,6 +232,18 @@
 
         window.addEventListener("resize", onResize);
         animate();
+    </script>
+    <script>
+        (() => {
+            const navToggle = document.querySelector(".nav-toggle");
+            const mainNav = document.getElementById("main-nav");
+            if (navToggle && mainNav) {
+                navToggle.addEventListener("click", () => {
+                    const isOpen = mainNav.classList.toggle("is-open");
+                    navToggle.setAttribute("aria-expanded", String(isOpen));
+                });
+            }
+        })();
     </script>
 </body>
 </html>

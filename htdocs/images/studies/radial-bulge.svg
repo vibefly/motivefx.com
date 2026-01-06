@@ -1,0 +1,24 @@
+<svg width="480" height="300" viewBox="0 0 480 300" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <radialGradient id="rb-bg" cx="50%" cy="50%" r="70%">
+      <stop offset="0%" stop-color="#0c1020" />
+      <stop offset="100%" stop-color="#04050a" />
+    </radialGradient>
+    <linearGradient id="rb-lines" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#3c78ff" />
+      <stop offset="100%" stop-color="#f5ff1a" />
+    </linearGradient>
+  </defs>
+  <rect width="480" height="300" fill="url(#rb-bg)" />
+  <g fill="none" stroke="url(#rb-lines)" stroke-width="2.2" opacity="0.9">
+    <path d="M60 150 Q240 110 420 150" />
+    <path d="M60 170 Q240 140 420 170" />
+    <path d="M60 130 Q240 90 420 130" opacity="0.7" />
+  </g>
+  <g stroke="#3c78ff" stroke-opacity="0.35" fill="none">
+    <circle cx="240" cy="150" r="38" />
+    <circle cx="240" cy="150" r="74" />
+    <circle cx="240" cy="150" r="118" />
+  </g>
+  <circle cx="240" cy="150" r="10" fill="#f5ff1a" />
+</svg>

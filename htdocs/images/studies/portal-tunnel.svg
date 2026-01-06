@@ -1,0 +1,26 @@
+<svg width="480" height="300" viewBox="0 0 480 300" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <radialGradient id="pt-bg" cx="50%" cy="50%" r="80%">
+      <stop offset="0%" stop-color="#0f1222" />
+      <stop offset="100%" stop-color="#05060c" />
+    </radialGradient>
+    <linearGradient id="pt-ring" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#00f0ff" />
+      <stop offset="100%" stop-color="#f5ff1a" />
+    </linearGradient>
+  </defs>
+  <rect width="480" height="300" fill="url(#pt-bg)" />
+  <g fill="none" stroke="url(#pt-ring)" stroke-width="2.4" opacity="0.9">
+    <circle cx="240" cy="150" r="30" />
+    <circle cx="240" cy="150" r="65" />
+    <circle cx="240" cy="150" r="105" />
+    <circle cx="240" cy="150" r="145" />
+  </g>
+  <g stroke="#00f0ff" stroke-width="1.4" opacity="0.45">
+    <line x1="240" y1="0" x2="240" y2="300" />
+    <line x1="0" y1="150" x2="480" y2="150" />
+    <line x1="60" y1="60" x2="420" y2="240" />
+    <line x1="60" y1="240" x2="420" y2="60" />
+  </g>
+  <circle cx="240" cy="150" r="10" fill="#f5ff1a" />
+</svg>
