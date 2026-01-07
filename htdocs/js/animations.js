@@ -121,20 +121,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const revealSectionsOnScroll = () => {
         const revealTargets = document.querySelectorAll('section');
-        if (typeof IntersectionObserver === 'undefined' || !revealTargets.length) {
-            revealTargets.forEach(section => section.classList.add('section-visible'));
+        if (!revealTargets.length) {
             return;
         }
-
-        const revealObserver = new IntersectionObserver((entries) => {
-            entries.forEach(entry => {
-                entry.target.classList.toggle('section-visible', entry.isIntersecting);
-            });
-        }, {
-            threshold: 0.25,
-        });
-
-        revealTargets.forEach(section => revealObserver.observe(section));
+        // Immediately show all sections; no scroll-reveal needed
+        revealTargets.forEach(section => section.classList.add('section-visible'));
     };
 
     const observeSectionsOnScroll = () => {
@@ -221,23 +212,7 @@ document.addEventListener('DOMContentLoaded', () => {
             });
         });
         
-        // --- 2. Scroll Animation Setup (GSAP ScrollTrigger) ---
-        // Register the necessary plugins
-        gsap.registerPlugin(ScrollTrigger);
-        
-        // (Existing GSAP parallax and stagger code for the sections)
-        gsap.from('.pillar', {
-            opacity: 0,
-            stagger: 0.2,
-            duration: 1,
-            scrollTrigger: {
-                trigger: '#services',
-                start: "top 80%",
-                toggleActions: "play none none none",
-            }
-        });
-        
-        // Removed previous hero parallax tweak; GSAP handles other scroll effects above.
+        // Scroll-triggered card animations removed
     }
 
     // --- 3. Shiny Button and Background Placeholder functions remain below ---
