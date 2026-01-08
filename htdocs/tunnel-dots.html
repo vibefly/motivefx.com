@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Curved Wireframe Tunnel | motiveFx</title>
+    <title>Curved Dotted Tunnel | motiveFx</title>
     <link rel="stylesheet" href="styles.css">
     <style>
         html, body {
@@ -71,8 +71,8 @@
     </header>
 
     <div id="overlay">
-        <h1>Curved Wireframe Tunnel</h1>
-        <p>Endless neon wireframe tube that bends and flows as the camera flies through.</p>
+        <h1>Curved Dotted Tunnel</h1>
+        <p>Endless tunnel built from neon dots that flow, wobble, and twist toward you.</p>
     </div>
 
     <canvas id="tunnel-canvas"></canvas>
@@ -91,12 +91,12 @@
             const camera = new THREE.PerspectiveCamera(70, window.innerWidth / window.innerHeight, 0.1, 400);
             camera.position.z = 10;
 
-            const lineMat = new THREE.LineBasicMaterial({ color: 0x55ccff, transparent: false, opacity: 1, linewidth: 2.5 });
+            const pointMat = new THREE.PointsMaterial({ color: 0x3aa7d6, size: 0.35, transparent: false, opacity: 0.8, sizeAttenuation: true });
             const tunnel = new THREE.Group();
             scene.add(tunnel);
 
             const ringCount = 100;
-            const segments = 48;
+            const segments = 72;
             const radius = 12;
             const spacing = 3.2;
             const noiseAmp = 2.2;
@@ -110,9 +110,9 @@
                     verts.push(Math.cos(angle) * radius, Math.sin(angle) * radius, 0);
                 }
                 geom.setAttribute('position', new THREE.Float32BufferAttribute(verts, 3));
-                const ring = new THREE.LineLoop(geom, lineMat.clone());
+                const ring = new THREE.Points(geom, pointMat.clone());
                 ring.position.z = -i * spacing;
-                ring.material.opacity = 0.35 + (i / ringCount) * 0.3;
+                ring.material.size = 0.32 + (i / ringCount) * 0.22;
                 tunnel.add(ring);
                 rings.push(ring);
             }
@@ -120,7 +120,7 @@
             const clock = new THREE.Clock();
             let offset = 0;
             const travelLength = ringCount * spacing;
-            const speed = 22;
+            const speed = 15;
             const pathFreq = 0.1;
             const pathAmpX = 7;
             const pathAmpY = 5.2;
@@ -146,7 +146,7 @@
                     if (zPos > spacing) zPos -= travelLength;
                     const { x, y } = pathOffset(zPos, time);
                     ring.position.set(x, y, zPos);
-                    ring.rotation.z = Math.sin(time * 0.35 + zPos * 0.07) * 0.6;
+                    ring.rotation.z = 0;
 
                     const pos = ring.geometry.attributes.position;
                     for (let i = 0; i < pos.count; i++) {
