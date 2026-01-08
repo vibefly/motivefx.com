@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Curved Wireframe Tunnel | motiveFx</title>
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        html, body {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 100%;
+            background: #05070d;
+            font-family: var(--font-primary);
+            color: var(--color-text-primary);
+            overflow: hidden;
+        }
+        canvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            display: block;
+            width: 100%;
+            height: 100%;
+            z-index: 0;
+        }
+        #overlay {
+            position: absolute;
+            top: 96px;
+            left: 16px;
+            padding: 14px 16px;
+            background: rgba(0, 0, 0, 0.55);
+            border: 1px solid var(--color-border-card);
+            border-radius: 10px;
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.45);
+            max-width: 320px;
+            z-index: 2;
+        }
+        #overlay h1 {
+            margin: 0 0 8px 0;
+            font-size: 18px;
+            color: var(--color-accent-neon);
+            letter-spacing: 0.06em;
+        }
+        #overlay p {
+            margin: 0;
+            font-size: 13px;
+            line-height: 1.45;
+            color: var(--color-text-secondary);
+        }
+    </style>
+</head>
+<body class="static-page vis-page">
+    <header id="main-header">
+        <a href="index.html" class="logo">motiveFx</a>
+        <button class="nav-toggle" aria-expanded="false" aria-controls="main-nav">
+            <span class="sr-only">Toggle navigation</span>
+            <span class="nav-toggle-bar"></span>
+            <span class="nav-toggle-bar"></span>
+            <span class="nav-toggle-bar"></span>
+        </button>
+        <nav id="main-nav">
+            <ul>
+                <li><a href="index.html#about">About</a></li>
+                <li><a href="index.html#services">Services</a></li>
+                <li><a href="index.html#studies">Studies</a></li>
+                <li><a href="index.html#contact">Contact</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <div id="overlay">
+        <h1>Curved Wireframe Tunnel</h1>
+        <p>Endless neon wireframe tube that bends and flows as the camera flies through.</p>
+    </div>
+
+    <canvas id="tunnel-canvas"></canvas>
+
+    <script src="js/three.min.r134.js"></script>
+    <script>
+        (() => {
+            const canvas = document.getElementById('tunnel-canvas');
+            const renderer = new THREE.WebGLRenderer({ canvas, antialias: true });
+            renderer.setPixelRatio(window.devicePixelRatio);
+            renderer.setSize(window.innerWidth, window.innerHeight);
+
+            const scene = new THREE.Scene();
+            scene.fog = new THREE.Fog(0x05070d, 20, 140);
+
+            const camera = new THREE.PerspectiveCamera(70, window.innerWidth / window.innerHeight, 0.1, 400);
+            camera.position.z = 10;
+
+            const lineMat = new THREE.LineBasicMaterial({ color: 0x55ccff, transparent: true, opacity: 0.9 });
+            const tunnel = new THREE.Group();
+            scene.add(tunnel);
+
+            const ringCount = 100;
+            const segments = 48;
+            const radius = 12;
+            const spacing = 3.2;
+            const noiseAmp = 2.2;
+
+            for (let i = 0; i < ringCount; i++) {
+                const geom = new THREE.BufferGeometry();
+                const verts = [];
+                for (let s = 0; s <= segments; s++) {
+                    const angle = (s / segments) * Math.PI * 2;
+                    verts.push(Math.cos(angle) * radius, Math.sin(angle) * radius, 0);
+                }
+                geom.setAttribute('position', new THREE.Float32BufferAttribute(verts, 3));
+                const ring = new THREE.LineLoop(geom, lineMat.clone());
+                ring.position.z = -i * spacing;
+                ring.material.opacity = 0.35 + (i / ringCount) * 0.3;
+                tunnel.add(ring);
+            }
+
+            const clock = new THREE.Clock();
+            let offset = 0;
+            const travelLength = ringCount * spacing;
+            const speed = 22;
+            const pathFreq = 0.08;
+            const pathAmpX = 6;
+            const pathAmpY = 4.5;
+
+            function pathOffset(z, t) {
+                const phase = (z + t * speed) * pathFreq;
+                return {
+                    x: Math.sin(phase) * pathAmpX,
+                    y: Math.cos(phase * 0.85) * pathAmpY
+                };
+            }
+
+            function animate() {
+                const dt = clock.getDelta();
+                offset = (offset + dt * speed) % travelLength;
+                const time = clock.elapsedTime;
+
+                tunnel.children.forEach((ring, idx) => {
+                    let zPos = -idx * spacing + offset;
+                    if (zPos > spacing) zPos -= travelLength;
+                    const { x, y } = pathOffset(zPos, time);
+                    ring.position.set(x, y, zPos);
+
+                    const pos = ring.geometry.attributes.position;
+                    for (let i = 0; i < pos.count; i++) {
+                        const vx = pos.getX(i);
+                        const vy = pos.getY(i);
+                        const noise = Math.sin((vx + time * 6) * 0.12) * Math.cos((vy - time * 5) * 0.12) * noiseAmp;
+                        pos.setZ(i, noise);
+                    }
+                    pos.needsUpdate = true;
+                });
+
+                const camCenter = pathOffset(0, time);
+                const lookAhead = pathOffset(-spacing * 8, time);
+                camera.position.set(camCenter.x, camCenter.y, camera.position.z);
+                camera.lookAt(lookAhead.x, lookAhead.y, -spacing * 8);
+
+                scene.rotation.z = Math.sin(time * 0.2) * 0.05;
+                renderer.render(scene, camera);
+                requestAnimationFrame(animate);
+            }
+            animate();
+
+            window.addEventListener('resize', () => {
+                renderer.setSize(window.innerWidth, window.innerHeight);
+                camera.aspect = window.innerWidth / window.innerHeight;
+                camera.updateProjectionMatrix();
+            });
+
+            const navToggle = document.querySelector(".nav-toggle");
+            const mainNav = document.getElementById("main-nav");
+            if (navToggle && mainNav) {
+                navToggle.addEventListener("click", () => {
+                    const isOpen = mainNav.classList.toggle("is-open");
+                    navToggle.setAttribute("aria-expanded", String(isOpen));
+                });
+            }
+        })();
+    </script>
+</body>
+</html>
