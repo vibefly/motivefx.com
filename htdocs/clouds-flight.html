@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Clouds Flight | motiveFx</title>
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        html, body {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 100%;
+            background: #05070d;
+            font-family: var(--font-primary);
+            color: var(--color-text-primary);
+            overflow: hidden;
+        }
+        canvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            display: block;
+            width: 100%;
+            height: 100%;
+            z-index: 0;
+        }
+        #overlay {
+            position: absolute;
+            top: 96px;
+            left: 16px;
+            padding: 14px 16px;
+            background: rgba(0, 0, 0, 0.55);
+            border: 1px solid var(--color-border-card);
+            border-radius: 10px;
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.45);
+            max-width: 320px;
+            z-index: 2;
+        }
+        #overlay h1 {
+            margin: 0 0 8px 0;
+            font-size: 18px;
+            color: var(--color-accent-neon);
+            letter-spacing: 0.06em;
+        }
+        #overlay p {
+            margin: 0;
+            font-size: 13px;
+            line-height: 1.45;
+            color: var(--color-text-secondary);
+        }
+    </style>
+</head>
+<body class="static-page vis-page">
+    <header id="main-header">
+        <a href="index.html" class="logo">motiveFx</a>
+        <button class="nav-toggle" aria-expanded="false" aria-controls="main-nav">
+            <span class="sr-only">Toggle navigation</span>
+            <span class="nav-toggle-bar"></span>
+            <span class="nav-toggle-bar"></span>
+            <span class="nav-toggle-bar"></span>
+        </button>
+        <nav id="main-nav">
+            <ul>
+                <li><a href="index.html#about">About</a></li>
+                <li><a href="index.html#services">Services</a></li>
+                <li><a href="index.html#studies">Studies</a></li>
+                <li><a href="index.html#contact">Contact</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <div id="overlay">
+        <h1>Clouds Flight</h1>
+        <p>Fly through drifting, layered neon clouds with subtle parallax and depth haze.</p>
+    </div>
+
+    <canvas id="clouds-canvas"></canvas>
+
+    <script src="js/three.min.r134.js"></script>
+    <script>
+        (() => {
+            const canvas = document.getElementById('clouds-canvas');
+            const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: false });
+            renderer.setPixelRatio(window.devicePixelRatio);
+            renderer.setSize(window.innerWidth, window.innerHeight);
+
+            const scene = new THREE.Scene();
+            scene.fog = new THREE.FogExp2(0x060912, 0.018);
+
+            const camera = new THREE.PerspectiveCamera(70, window.innerWidth / window.innerHeight, 0.1, 400);
+            camera.position.z = 10;
+
+            function makeCloudTexture() {
+                const size = 256;
+                const c = document.createElement('canvas');
+                c.width = c.height = size;
+                const ctx = c.getContext('2d');
+                const g = ctx.createRadialGradient(size/2, size/2, size*0.1, size/2, size/2, size*0.5);
+                g.addColorStop(0, 'rgba(120, 200, 255, 0.9)');
+                g.addColorStop(0.4, 'rgba(60, 150, 255, 0.5)');
+                g.addColorStop(1, 'rgba(10, 30, 60, 0)');
+                ctx.fillStyle = g;
+                ctx.fillRect(0,0,size,size);
+                const tex = new THREE.Texture(c);
+                tex.needsUpdate = true;
+                return tex;
+            }
+
+            const cloudTexture = makeCloudTexture();
+            const cloudMat = new THREE.PointsMaterial({
+                map: cloudTexture,
+                size: 28,
+                transparent: true,
+                depthWrite: false,
+                opacity: 0.9,
+                blending: THREE.AdditiveBlending,
+                color: new THREE.Color(0x7ce0ff)
+            });
+
+            const layerCount = 4;
+            const cloudsPerLayer = 600;
+            const spread = 80;
+            const depth = 220;
+            const layers = [];
+
+            for (let l = 0; l < layerCount; l++) {
+                const geom = new THREE.BufferGeometry();
+                const positions = new Float32Array(cloudsPerLayer * 3);
+                for (let i = 0; i < cloudsPerLayer; i++) {
+                    positions[i*3] = (Math.random() - 0.5) * spread;
+                    positions[i*3+1] = (Math.random() - 0.5) * spread * 0.55;
+                    positions[i*3+2] = -Math.random() * depth;
+                }
+                geom.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+                const pts = new THREE.Points(geom, cloudMat.clone());
+                pts.material.size *= 0.8 + l * 0.1;
+                pts.position.z = -l * 12;
+                scene.add(pts);
+                layers.push({ mesh: pts, positions, speed: 8 + l * 2.5 });
+            }
+
+            const clock = new THREE.Clock();
+            function animate() {
+                const dt = clock.getDelta();
+                const time = clock.elapsedTime;
+
+                layers.forEach(layer => {
+                    const mesh = layer.mesh;
+                    const positions = layer.positions;
+                    mesh.position.x = Math.sin(time * 0.12 + mesh.position.z * 0.02) * 6;
+                    mesh.position.y = Math.sin(time * 0.18 + mesh.position.z * 0.015) * 4;
+
+                    for (let i = 0; i < positions.count; i++) {
+                        let z = positions.getZ(i) + layer.speed * dt;
+                        if (z > 5) z = -depth;
+                        positions.setZ(i, z);
+                    }
+                    positions.needsUpdate = true;
+                });
+
+                camera.position.z = 10;
+                camera.lookAt(0, 0, -20);
+
+                renderer.render(scene, camera);
+                requestAnimationFrame(animate);
+            }
+            animate();
+
+            window.addEventListener('resize', () => {
+                renderer.setSize(window.innerWidth, window.innerHeight);
+                camera.aspect = window.innerWidth / window.innerHeight;
+                camera.updateProjectionMatrix();
+            });
+
+            const navToggle = document.querySelector('.nav-toggle');
+            const mainNav = document.getElementById('main-nav');
+            if (navToggle && mainNav) {
+                navToggle.addEventListener('click', () => {
+                    const isOpen = mainNav.classList.toggle('is-open');
+                    navToggle.setAttribute('aria-expanded', String(isOpen));
+                });
+            }
+        })();
+    </script>
+</body>
+</html>
