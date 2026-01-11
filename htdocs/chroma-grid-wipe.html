@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chroma Grid Wipe | motiveFx</title>
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        :root {
+            color-scheme: light;
+        }
+
+        html, body {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 100%;
+            background: #0e0f12;
+            font-family: var(--font-primary);
+            overflow: hidden;
+        }
+
+        canvas {
+            display: block;
+            width: 100%;
+            height: 100%;
+        }
+
+        .overlay {
+            position: fixed;
+            top: 72px;
+            left: 0;
+            width: 100%;
+            padding: 24px;
+            pointer-events: none;
+            background: linear-gradient(180deg, rgba(14, 15, 18, 0.85), rgba(14, 15, 18, 0));
+        }
+
+        .title {
+            font-size: clamp(20px, 3vw, 30px);
+            letter-spacing: 0.2em;
+            text-transform: uppercase;
+            color: #f6f4f1;
+            margin: 0 0 6px 0;
+        }
+
+        .subtitle {
+            margin: 0;
+            font-size: clamp(14px, 2.4vw, 18px);
+            color: #c6c2bf;
+        }
+    </style>
+</head>
+<body class="static-page vis-page no-js">
+    <header id="main-header">
+        <a href="index.html" class="logo">motiveFx</a>
+        <button class="nav-toggle" aria-expanded="false" aria-controls="main-nav">
+            <span class="sr-only">Toggle navigation</span>
+            <span class="nav-toggle-bar"></span>
+            <span class="nav-toggle-bar"></span>
+            <span class="nav-toggle-bar"></span>
+        </button>
+        <nav id="main-nav">
+            <ul>
+                <li><a href="index.html#about">About</a></li>
+                <li><a href="index.html#services">Services</a></li>
+                <li><a href="index.html#studies">Studies</a></li>
+                <li><a href="index.html#contact">Contact</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <div class="overlay">
+        <p class="title">Chroma Grid Wipe</p>
+        <p class="subtitle">Vibrant tiles pulse in a shared palette as each cell wipes to a new color.</p>
+    </div>
+
+    <canvas id="chroma-grid"></canvas>
+
+    <script src="js/animations.js" defer></script>
+    <script>
+        (() => {
+            const canvas = document.getElementById('chroma-grid');
+            const ctx = canvas.getContext('2d');
+
+            const palette = [
+                '#ff6f59',
+                '#f7b267',
+                '#ffe66d',
+                '#6bd4ff',
+                '#4d9de0',
+                '#8f6fff',
+                '#3cd5a6',
+                '#ff8fab'
+            ];
+
+            let width = 0;
+            let height = 0;
+            let cols = 0;
+            let rows = 0;
+            let colWidths = [];
+            let rowHeights = [];
+            let cells = [];
+            let gradient = null;
+
+            const baseCellSize = 120;
+            const minCellSize = 70;
+            const maxCellSize = 180;
+            const colPhases = [];
+            const rowPhases = [];
+            const colSpeeds = [];
+            const rowSpeeds = [];
+
+            const randFromPalette = () => palette[Math.floor(Math.random() * palette.length)];
+
+            const buildGradient = () => {
+                gradient = ctx.createLinearGradient(0, 0, width, height);
+                gradient.addColorStop(0, '#10151c');
+                gradient.addColorStop(0.5, '#141822');
+                gradient.addColorStop(1, '#0f1218');
+            };
+
+            const createCell = (col, row) => ({
+                col,
+                row,
+                color: randFromPalette(),
+                nextColor: null,
+                wipeDir: 'up',
+                wipeProgress: 1,
+                wipeSpeed: 0.6 + Math.random() * 0.9,
+                holdTime: 0.8 + Math.random() * 1.6,
+                holdTimer: 0
+            });
+
+            const setupGrid = () => {
+                cols = Math.max(5, Math.floor(width / baseCellSize));
+                rows = Math.max(4, Math.floor(height / baseCellSize));
+
+                colWidths = new Array(cols).fill(baseCellSize);
+                rowHeights = new Array(rows).fill(baseCellSize);
+
+                colPhases.length = cols;
+                rowPhases.length = rows;
+                colSpeeds.length = cols;
+                rowSpeeds.length = rows;
+
+                for (let i = 0; i < cols; i++) {
+                    colPhases[i] = Math.random() * Math.PI * 2;
+                    colSpeeds[i] = 0.9 + Math.random() * 0.9;
+                }
+                for (let j = 0; j < rows; j++) {
+                    rowPhases[j] = Math.random() * Math.PI * 2;
+                    rowSpeeds[j] = 0.9 + Math.random() * 0.9;
+                }
+
+                cells = [];
+                for (let row = 0; row < rows; row++) {
+                    for (let col = 0; col < cols; col++) {
+                        cells.push(createCell(col, row));
+                    }
+                }
+            };
+
+            const resize = () => {
+                width = window.innerWidth;
+                height = window.innerHeight;
+                canvas.width = Math.floor(width * window.devicePixelRatio);
+                canvas.height = Math.floor(height * window.devicePixelRatio);
+                ctx.setTransform(window.devicePixelRatio, 0, 0, window.devicePixelRatio, 0, 0);
+                setupGrid();
+                buildGradient();
+            };
+
+            const pickDirection = () => {
+                const dirs = ['up', 'down', 'left', 'right'];
+                return dirs[Math.floor(Math.random() * dirs.length)];
+            };
+
+            const startWipe = (cell) => {
+                cell.nextColor = randFromPalette();
+                if (cell.nextColor === cell.color) {
+                    cell.nextColor = randFromPalette();
+                }
+                cell.wipeDir = pickDirection();
+                cell.wipeProgress = 0;
+                cell.wipeSpeed = 0.7 + Math.random() * 1.1;
+            };
+
+            const updateCell = (cell, delta) => {
+                if (cell.wipeProgress < 1) {
+                    cell.wipeProgress = Math.min(1, cell.wipeProgress + delta * cell.wipeSpeed);
+                    if (cell.wipeProgress === 1) {
+                        cell.color = cell.nextColor || cell.color;
+                        cell.nextColor = null;
+                        cell.holdTimer = 0;
+                    }
+                    return;
+                }
+
+                cell.holdTimer += delta;
+                if (cell.holdTimer >= cell.holdTime) {
+                    startWipe(cell);
+                }
+            };
+
+            const drawCell = (cell, x, y, w, h) => {
+                ctx.fillStyle = cell.color;
+                ctx.fillRect(x, y, w, h);
+
+                if (cell.wipeProgress >= 1 || !cell.nextColor) {
+                    return;
+                }
+
+                const p = cell.wipeProgress;
+                ctx.fillStyle = cell.nextColor;
+
+                if (cell.wipeDir === 'up') {
+                    const wipeH = h * p;
+                    ctx.fillRect(x, y + h - wipeH, w, wipeH);
+                } else if (cell.wipeDir === 'down') {
+                    const wipeH = h * p;
+                    ctx.fillRect(x, y, w, wipeH);
+                } else if (cell.wipeDir === 'left') {
+                    const wipeW = w * p;
+                    ctx.fillRect(x + w - wipeW, y, wipeW, h);
+                } else {
+                    const wipeW = w * p;
+                    ctx.fillRect(x, y, wipeW, h);
+                }
+            };
+
+            let lastTime = 0;
+            const animate = (time) => {
+                const now = time * 0.001;
+                const delta = Math.min(now - lastTime, 0.05);
+                lastTime = now;
+
+                ctx.fillStyle = gradient;
+                ctx.fillRect(0, 0, width, height);
+
+                let x = 0;
+                colWidths = colWidths.map((_, idx) => {
+                    const scale = 0.8 + 0.25 * Math.sin(now * colSpeeds[idx] + colPhases[idx]);
+                    return Math.max(minCellSize, Math.min(maxCellSize, baseCellSize * scale));
+                });
+                rowHeights = rowHeights.map((_, idx) => {
+                    const scale = 0.8 + 0.25 * Math.sin(now * rowSpeeds[idx] + rowPhases[idx]);
+                    return Math.max(minCellSize, Math.min(maxCellSize, baseCellSize * scale));
+                });
+
+                const colScale = width / colWidths.reduce((sum, val) => sum + val, 0);
+                const rowScale = height / rowHeights.reduce((sum, val) => sum + val, 0);
+
+                colWidths = colWidths.map(val => val * colScale);
+                rowHeights = rowHeights.map(val => val * rowScale);
+
+                let cellIndex = 0;
+                for (let row = 0; row < rows; row++) {
+                    let y = rowHeights.slice(0, row).reduce((sum, val) => sum + val, 0);
+                    for (let col = 0; col < cols; col++) {
+                        const w = colWidths[col];
+                        const h = rowHeights[row];
+                        const cell = cells[cellIndex++];
+                        updateCell(cell, delta);
+                        drawCell(cell, x, y, w, h);
+                        x += w;
+                    }
+                    x = 0;
+                }
+
+                requestAnimationFrame(animate);
+            };
+
+            window.addEventListener('resize', resize);
+
+            resize();
+            requestAnimationFrame(animate);
+        })();
+    </script>
+</body>
+</html>

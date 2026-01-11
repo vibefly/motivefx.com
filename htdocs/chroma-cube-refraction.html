@@ -1,0 +1,423 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chroma Cube Refraction | motiveFx</title>
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        :root {
+            color-scheme: light;
+        }
+
+        html, body {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 100%;
+            background: #0e0f12;
+            font-family: var(--font-primary);
+            overflow: hidden;
+        }
+
+        canvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+        }
+
+        #grid-canvas {
+            z-index: 0;
+        }
+
+        #cube-canvas {
+            z-index: 1;
+        }
+
+        .overlay {
+            position: fixed;
+            top: 72px;
+            left: 0;
+            width: 100%;
+            padding: 24px;
+            pointer-events: none;
+            z-index: 2;
+            background: linear-gradient(180deg, rgba(14, 15, 18, 0.85), rgba(14, 15, 18, 0));
+        }
+
+        .title {
+            font-size: clamp(20px, 3vw, 30px);
+            letter-spacing: 0.2em;
+            text-transform: uppercase;
+            color: #f6f4f1;
+            margin: 0 0 6px 0;
+        }
+
+        .subtitle {
+            margin: 0;
+            font-size: clamp(14px, 2.4vw, 18px);
+            color: #c6c2bf;
+        }
+    </style>
+</head>
+<body class="static-page vis-page no-js">
+    <header id="main-header">
+        <a href="index.html" class="logo">motiveFx</a>
+        <button class="nav-toggle" aria-expanded="false" aria-controls="main-nav">
+            <span class="sr-only">Toggle navigation</span>
+            <span class="nav-toggle-bar"></span>
+            <span class="nav-toggle-bar"></span>
+            <span class="nav-toggle-bar"></span>
+        </button>
+        <nav id="main-nav">
+            <ul>
+                <li><a href="index.html#about">About</a></li>
+                <li><a href="index.html#services">Services</a></li>
+                <li><a href="index.html#studies">Studies</a></li>
+                <li><a href="index.html#contact">Contact</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <div class="overlay">
+        <p class="title">Chroma Cube Refraction</p>
+        <p class="subtitle">A vibrant grid breathes behind a glass cube refracting the palette.</p>
+    </div>
+
+    <canvas id="grid-canvas"></canvas>
+    <canvas id="cube-canvas"></canvas>
+
+    <script src="js/three.min.r134.js"></script>
+    <script src="js/animations.js" defer></script>
+    <script>
+        (() => {
+            const gridCanvas = document.getElementById('grid-canvas');
+            const gridCtx = gridCanvas.getContext('2d');
+
+            const palette = [
+                '#ff6f59',
+                '#f7b267',
+                '#ffe66d',
+                '#6bd4ff',
+                '#4d9de0',
+                '#8f6fff',
+                '#3cd5a6',
+                '#ff8fab'
+            ];
+
+            let width = 0;
+            let height = 0;
+            let cols = 0;
+            let rows = 0;
+            let colWidths = [];
+            let rowHeights = [];
+            let colPositions = [];
+            let rowPositions = [];
+            let cells = [];
+            let gradient = null;
+
+            const baseCellSize = 120;
+            const minCellSize = 70;
+            const maxCellSize = 190;
+            const colPhases = [];
+            const rowPhases = [];
+            const colSpeeds = [];
+            const rowSpeeds = [];
+
+            const randFromPalette = () => palette[Math.floor(Math.random() * palette.length)];
+
+            const buildGradient = () => {
+                gradient = gridCtx.createLinearGradient(0, 0, width, height);
+                gradient.addColorStop(0, '#10151c');
+                gradient.addColorStop(0.5, '#141822');
+                gradient.addColorStop(1, '#0f1218');
+            };
+
+            const createCell = (col, row) => ({
+                col,
+                row,
+                color: randFromPalette(),
+                nextColor: null,
+                wipeDir: 'up',
+                wipeProgress: 1,
+                wipeSpeed: 0.8 + Math.random() * 1.2,
+                holdTime: 0.6 + Math.random() * 1.3,
+                holdTimer: 0
+            });
+
+            const setupGrid = () => {
+                cols = Math.max(5, Math.floor(width / baseCellSize));
+                rows = Math.max(4, Math.floor(height / baseCellSize));
+
+                colWidths = new Array(cols).fill(baseCellSize);
+                rowHeights = new Array(rows).fill(baseCellSize);
+                colPositions = new Array(cols).fill(0);
+                rowPositions = new Array(rows).fill(0);
+
+                colPhases.length = cols;
+                rowPhases.length = rows;
+                colSpeeds.length = cols;
+                rowSpeeds.length = rows;
+
+                for (let i = 0; i < cols; i++) {
+                    colPhases[i] = Math.random() * Math.PI * 2;
+                    colSpeeds[i] = 1.1 + Math.random() * 1.2;
+                }
+                for (let j = 0; j < rows; j++) {
+                    rowPhases[j] = Math.random() * Math.PI * 2;
+                    rowSpeeds[j] = 1.1 + Math.random() * 1.2;
+                }
+
+                cells = [];
+                for (let row = 0; row < rows; row++) {
+                    for (let col = 0; col < cols; col++) {
+                        cells.push(createCell(col, row));
+                    }
+                }
+            };
+
+            const resizeGrid = () => {
+                width = window.innerWidth;
+                height = window.innerHeight;
+                gridCanvas.width = Math.floor(width * window.devicePixelRatio);
+                gridCanvas.height = Math.floor(height * window.devicePixelRatio);
+                gridCtx.setTransform(window.devicePixelRatio, 0, 0, window.devicePixelRatio, 0, 0);
+                setupGrid();
+                buildGradient();
+            };
+
+            const pickDirection = () => {
+                const dirs = ['up', 'down', 'left', 'right'];
+                return dirs[Math.floor(Math.random() * dirs.length)];
+            };
+
+            const startWipe = (cell) => {
+                cell.nextColor = randFromPalette();
+                if (cell.nextColor === cell.color) {
+                    cell.nextColor = randFromPalette();
+                }
+                cell.wipeDir = pickDirection();
+                cell.wipeProgress = 0;
+                cell.wipeSpeed = 0.8 + Math.random() * 1.3;
+            };
+
+            const updateCell = (cell, delta) => {
+                if (cell.wipeProgress < 1) {
+                    cell.wipeProgress = Math.min(1, cell.wipeProgress + delta * cell.wipeSpeed);
+                    if (cell.wipeProgress === 1) {
+                        cell.color = cell.nextColor || cell.color;
+                        cell.nextColor = null;
+                        cell.holdTimer = 0;
+                    }
+                    return;
+                }
+
+                cell.holdTimer += delta;
+                if (cell.holdTimer >= cell.holdTime) {
+                    startWipe(cell);
+                }
+            };
+
+            const drawCell = (cell, x, y, w, h) => {
+                gridCtx.fillStyle = cell.color;
+                gridCtx.fillRect(x, y, w, h);
+
+                if (cell.wipeProgress >= 1 || !cell.nextColor) {
+                    return;
+                }
+
+                const p = cell.wipeProgress;
+                gridCtx.fillStyle = cell.nextColor;
+
+                if (cell.wipeDir === 'up') {
+                    const wipeH = h * p;
+                    gridCtx.fillRect(x, y + h - wipeH, w, wipeH);
+                } else if (cell.wipeDir === 'down') {
+                    const wipeH = h * p;
+                    gridCtx.fillRect(x, y, w, wipeH);
+                } else if (cell.wipeDir === 'left') {
+                    const wipeW = w * p;
+                    gridCtx.fillRect(x + w - wipeW, y, wipeW, h);
+                } else {
+                    const wipeW = w * p;
+                    gridCtx.fillRect(x, y, wipeW, h);
+                }
+            };
+
+            const computeGrid = (time) => {
+                const colCount = colWidths.length;
+                const rowCount = rowHeights.length;
+
+                let totalW = 0;
+                for (let i = 0; i < colCount; i++) {
+                    const scale = 0.78 + 0.28 * Math.sin(time * colSpeeds[i] + colPhases[i]);
+                    colWidths[i] = Math.max(minCellSize, Math.min(maxCellSize, baseCellSize * scale));
+                    totalW += colWidths[i];
+                }
+
+                let totalH = 0;
+                for (let j = 0; j < rowCount; j++) {
+                    const scale = 0.78 + 0.28 * Math.sin(time * rowSpeeds[j] + rowPhases[j]);
+                    rowHeights[j] = Math.max(minCellSize, Math.min(maxCellSize, baseCellSize * scale));
+                    totalH += rowHeights[j];
+                }
+
+                const colScale = width / totalW;
+                const rowScale = height / totalH;
+
+                let x = 0;
+                for (let i = 0; i < colCount; i++) {
+                    colWidths[i] *= colScale;
+                    colPositions[i] = x;
+                    x += colWidths[i];
+                }
+
+                let y = 0;
+                for (let j = 0; j < rowCount; j++) {
+                    rowHeights[j] *= rowScale;
+                    rowPositions[j] = y;
+                    y += rowHeights[j];
+                }
+            };
+
+            const cubeCanvas = document.getElementById('cube-canvas');
+            const renderer = new THREE.WebGLRenderer({ canvas: cubeCanvas, antialias: true, alpha: true });
+            renderer.setPixelRatio(window.devicePixelRatio);
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            renderer.outputEncoding = THREE.sRGBEncoding;
+            renderer.setClearColor(0x000000, 0);
+
+            const scene = new THREE.Scene();
+            const camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 20);
+            camera.position.set(0, 0, 5);
+
+            const gridTexture = new THREE.CanvasTexture(gridCanvas);
+            gridTexture.encoding = THREE.sRGBEncoding;
+            gridTexture.minFilter = THREE.LinearFilter;
+            gridTexture.magFilter = THREE.LinearFilter;
+            gridTexture.wrapS = THREE.ClampToEdgeWrapping;
+            gridTexture.wrapT = THREE.ClampToEdgeWrapping;
+
+            const cubeMaterial = new THREE.ShaderMaterial({
+                transparent: true,
+                uniforms: {
+                    uBackground: { value: gridTexture },
+                    uResolution: { value: new THREE.Vector2(window.innerWidth * window.devicePixelRatio, window.innerHeight * window.devicePixelRatio) },
+                    uTime: { value: 0 }
+                },
+                vertexShader: `
+                    varying vec3 vNormal;
+                    void main() {
+                        vNormal = normalize(normalMatrix * normal);
+                        vec4 worldPos = modelMatrix * vec4(position, 1.0);
+                        gl_Position = projectionMatrix * viewMatrix * worldPos;
+                    }
+                `,
+                fragmentShader: `
+                    uniform sampler2D uBackground;
+                    uniform vec2 uResolution;
+                    uniform float uTime;
+                    varying vec3 vNormal;
+
+                    void main() {
+                        vec2 uv = gl_FragCoord.xy / uResolution;
+                        vec3 normal = normalize(vNormal);
+                        float refractStrength = 0.05 + 0.015 * sin(uTime * 0.8);
+                        vec2 offset = normal.xy * refractStrength;
+                        vec3 refracted = texture2D(uBackground, uv + offset).rgb;
+
+                        float fresnel = pow(1.0 - clamp(dot(normal, vec3(0.0, 0.0, 1.0)), 0.0, 1.0), 2.2);
+                        vec3 highlight = vec3(1.0) * fresnel * 0.6;
+                        vec3 color = refracted * 0.9 + highlight;
+                        float alpha = 0.68 + fresnel * 0.22;
+                        gl_FragColor = vec4(color, alpha);
+                    }
+                `
+            });
+
+            const createRoundedBoxGeometry = (width, height, depth, radius, smoothness) => {
+                const shape = new THREE.Shape();
+                const eps = 0.00001;
+                const radiusClamp = Math.min(radius, Math.min(width, height) * 0.5 - eps);
+
+                shape.absarc(eps, eps, eps, -Math.PI / 2, -Math.PI, true);
+                shape.absarc(eps, height - radiusClamp * 2, eps, Math.PI, Math.PI / 2, true);
+                shape.absarc(width - radiusClamp * 2, height - radiusClamp * 2, eps, Math.PI / 2, 0, true);
+                shape.absarc(width - radiusClamp * 2, eps, eps, 0, -Math.PI / 2, true);
+
+                const geometry = new THREE.ExtrudeGeometry(shape, {
+                    depth: depth - radiusClamp * 2,
+                    bevelEnabled: true,
+                    bevelSegments: smoothness * 2,
+                    steps: 1,
+                    bevelSize: radiusClamp - eps,
+                    bevelThickness: radiusClamp,
+                    curveSegments: smoothness
+                });
+
+                geometry.center();
+                return geometry;
+            };
+
+            const cubeSize = 1.8;
+            const cubeRadius = cubeSize / 8;
+            const cube = new THREE.Mesh(
+                createRoundedBoxGeometry(cubeSize, cubeSize, cubeSize, cubeRadius, 10),
+                cubeMaterial
+            );
+            scene.add(cube);
+
+            const resize = () => {
+                resizeGrid();
+                renderer.setSize(window.innerWidth, window.innerHeight);
+                camera.aspect = window.innerWidth / window.innerHeight;
+                camera.updateProjectionMatrix();
+                cubeMaterial.uniforms.uResolution.value.set(
+                    window.innerWidth * window.devicePixelRatio,
+                    window.innerHeight * window.devicePixelRatio
+                );
+            };
+
+            let lastTime = 0;
+            const animate = (time) => {
+                const now = time * 0.001;
+                const delta = Math.min(now - lastTime, 0.05);
+                lastTime = now;
+
+                gridCtx.fillStyle = gradient;
+                gridCtx.fillRect(0, 0, width, height);
+
+                computeGrid(now);
+
+                let cellIndex = 0;
+                for (let row = 0; row < rows; row++) {
+                    const y = rowPositions[row];
+                    const h = rowHeights[row];
+                    for (let col = 0; col < cols; col++) {
+                        const x = colPositions[col];
+                        const w = colWidths[col];
+                        const cell = cells[cellIndex++];
+                        updateCell(cell, delta);
+                        drawCell(cell, x, y, w, h);
+                    }
+                }
+
+                gridTexture.needsUpdate = true;
+                cubeMaterial.uniforms.uTime.value = now;
+                cube.rotation.x = now * 0.35;
+                cube.rotation.y = now * 0.55;
+                renderer.render(scene, camera);
+
+                requestAnimationFrame(animate);
+            };
+
+            window.addEventListener('resize', resize);
+
+            resize();
+            requestAnimationFrame(animate);
+        })();
+    </script>
+</body>
+</html>
