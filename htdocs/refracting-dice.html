@@ -328,7 +328,7 @@
             refractionScene.add(bgPlane);
 
             const cubeSize = 1.8;
-            const cubeBevel = cubeSize / 14;
+            const cubeBevel = cubeSize / 60;
             const pipHoleRadius = cubeSize * 0.11;
             const pipInsertRadius = cubeSize * 0.095;
             const pipOffset = cubeSize * 0.23;
@@ -442,7 +442,9 @@
                         vec3 tint = vec3(0.38, 0.015, 0.04);
                         float sheen = pow(max(dot(normal, uLightDir), 0.0), 8.0) * 0.45;
                         vec3 highlight = vec3(1.0) * (fresnel * 1.1 + sheen);
-                        vec3 color = refracted * tint + highlight;
+                        float density = 0.25 + (1.0 - abs(normal.z)) * 0.65;
+                        vec3 absorption = mix(vec3(1.0), tint * 0.6, density);
+                        vec3 color = refracted * tint * absorption + highlight * 0.9;
 
                         float alpha = 0.9 + fresnel * 0.08;
                         gl_FragColor = vec4(color, alpha);
@@ -586,12 +588,18 @@
                 gridCtx.fillStyle = gradient;
                 gridCtx.fillRect(0, 0, width, height);
 
-                const square = 84;
-                for (let y = 0; y < height; y += square) {
-                    for (let x = 0; x < width; x += square) {
-                        const isDark = ((x / square) + (y / square)) % 2 === 0;
-                        gridCtx.fillStyle = isDark ? '#0b0b0b' : '#f7f7f7';
-                        gridCtx.fillRect(x, y, square, square);
+                computeGrid(now);
+
+                let cellIndex = 0;
+                for (let row = 0; row < rows; row++) {
+                    const y = rowPositions[row];
+                    const h = rowHeights[row];
+                    for (let col = 0; col < cols; col++) {
+                        const x = colPositions[col];
+                        const w = colWidths[col];
+                        const cell = cells[cellIndex++];
+                        updateCell(cell, delta);
+                        drawCell(cell, x, y, w, h);
                     }
                 }
 
