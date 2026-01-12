@@ -300,17 +300,47 @@
             gridTexture.wrapS = THREE.ClampToEdgeWrapping;
             gridTexture.wrapT = THREE.ClampToEdgeWrapping;
 
-            const cubeMaterial = new THREE.ShaderMaterial({
+            const renderTarget = new THREE.WebGLRenderTarget(
+                window.innerWidth * window.devicePixelRatio,
+                window.innerHeight * window.devicePixelRatio
+            );
+            renderTarget.texture.encoding = THREE.sRGBEncoding;
+
+            const refractionScene = new THREE.Scene();
+            const bgPlane = new THREE.Mesh(
+                new THREE.PlaneGeometry(1, 1),
+                new THREE.MeshBasicMaterial({ map: gridTexture })
+            );
+            refractionScene.add(bgPlane);
+
+            const cubeSize = 1.8;
+            const cubeBevel = cubeSize / 14;
+            const pipHoleRadius = cubeSize * 0.11;
+            const pipInsertRadius = cubeSize * 0.095;
+            const pipOffset = cubeSize * 0.23;
+            const pipInset = cubeSize * 0.03;
+            const pipDepth = cubeSize * 0.045;
+
+            const outerMaterial = new THREE.ShaderMaterial({
                 transparent: true,
                 uniforms: {
-                    uBackground: { value: gridTexture },
+                    uBackground: { value: renderTarget.texture },
                     uResolution: { value: new THREE.Vector2(window.innerWidth * window.devicePixelRatio, window.innerHeight * window.devicePixelRatio) },
-                    uTime: { value: 0 }
+                    uTime: { value: 0 },
+                    uLightDir: { value: new THREE.Vector3(-0.6, 0.7, 0.4).normalize() },
+                    uHalfSize: { value: cubeSize * 0.5 },
+                    uPipRadius: { value: pipHoleRadius },
+                    uPipOffset: { value: pipOffset },
+                    uPipInset: { value: pipInset },
+                    uDisableHoles: { value: 0 }
                 },
+                depthWrite: true,
                 vertexShader: `
                     varying vec3 vNormal;
+                    varying vec3 vPosition;
                     void main() {
                         vNormal = normalize(normalMatrix * normal);
+                        vPosition = position;
                         vec4 worldPos = modelMatrix * vec4(position, 1.0);
                         gl_Position = projectionMatrix * viewMatrix * worldPos;
                     }
@@ -319,20 +349,88 @@
                     uniform sampler2D uBackground;
                     uniform vec2 uResolution;
                     uniform float uTime;
+                    uniform vec3 uLightDir;
+                    uniform float uHalfSize;
+                    uniform float uPipRadius;
+                    uniform float uPipOffset;
+                    uniform float uPipInset;
+                    uniform float uDisableHoles;
                     varying vec3 vNormal;
+                    varying vec3 vPosition;
+
+                    float pipMask(vec2 p, vec2 c, float r) {
+                        return 1.0 - smoothstep(r * 0.9, r, distance(p, c));
+                    }
+
+                    float dicePips(vec3 pos) {
+                        float ax = abs(pos.x);
+                        float ay = abs(pos.y);
+                        float az = abs(pos.z);
+                        float mask = 0.0;
+                        float edge = uHalfSize - uPipInset;
+
+                        if (ax >= ay && ax >= az) {
+                            if (abs(pos.x) < edge) return 0.0;
+                            vec2 p = vec2(pos.z, pos.y);
+                            if (pos.x > 0.0) {
+                                mask = max(mask, pipMask(p, vec2(-uPipOffset, -uPipOffset), uPipRadius));
+                                mask = max(mask, pipMask(p, vec2(0.0, 0.0), uPipRadius));
+                                mask = max(mask, pipMask(p, vec2(uPipOffset, uPipOffset), uPipRadius));
+                            } else {
+                                mask = max(mask, pipMask(p, vec2(-uPipOffset, -uPipOffset), uPipRadius));
+                                mask = max(mask, pipMask(p, vec2(uPipOffset, -uPipOffset), uPipRadius));
+                                mask = max(mask, pipMask(p, vec2(-uPipOffset, uPipOffset), uPipRadius));
+                                mask = max(mask, pipMask(p, vec2(uPipOffset, uPipOffset), uPipRadius));
+                            }
+                        } else if (ay >= ax && ay >= az) {
+                            if (abs(pos.y) < edge) return 0.0;
+                            vec2 p = vec2(pos.x, pos.z);
+                            if (pos.y > 0.0) {
+                                mask = max(mask, pipMask(p, vec2(-uPipOffset, -uPipOffset), uPipRadius));
+                                mask = max(mask, pipMask(p, vec2(uPipOffset, uPipOffset), uPipRadius));
+                            } else {
+                                mask = max(mask, pipMask(p, vec2(-uPipOffset, -uPipOffset), uPipRadius));
+                                mask = max(mask, pipMask(p, vec2(uPipOffset, -uPipOffset), uPipRadius));
+                                mask = max(mask, pipMask(p, vec2(0.0, 0.0), uPipRadius));
+                                mask = max(mask, pipMask(p, vec2(-uPipOffset, uPipOffset), uPipRadius));
+                                mask = max(mask, pipMask(p, vec2(uPipOffset, uPipOffset), uPipRadius));
+                            }
+                        } else {
+                            if (abs(pos.z) < edge) return 0.0;
+                            vec2 p = vec2(pos.x, pos.y);
+                            if (pos.z > 0.0) {
+                                mask = max(mask, pipMask(p, vec2(0.0, 0.0), uPipRadius));
+                            } else {
+                                mask = max(mask, pipMask(p, vec2(-uPipOffset, -uPipOffset), uPipRadius));
+                                mask = max(mask, pipMask(p, vec2(uPipOffset, -uPipOffset), uPipRadius));
+                                mask = max(mask, pipMask(p, vec2(-uPipOffset, 0.0), uPipRadius));
+                                mask = max(mask, pipMask(p, vec2(uPipOffset, 0.0), uPipRadius));
+                                mask = max(mask, pipMask(p, vec2(-uPipOffset, uPipOffset), uPipRadius));
+                                mask = max(mask, pipMask(p, vec2(uPipOffset, uPipOffset), uPipRadius));
+                            }
+                        }
+
+                        return mask;
+                    }
 
                     void main() {
+                        float pip = dicePips(vPosition);
+                        if (uDisableHoles < 0.5 && pip > 0.15) {
+                            discard;
+                        }
                         vec2 uv = gl_FragCoord.xy / uResolution;
                         vec3 normal = normalize(vNormal);
-                        float refractStrength = 0.05 + 0.015 * sin(uTime * 0.8);
+                        float refractStrength = 0.06 + 0.02 * sin(uTime * 0.7);
                         vec2 offset = normal.xy * refractStrength;
                         vec3 refracted = texture2D(uBackground, uv + offset).rgb;
 
-                        float fresnel = pow(1.0 - clamp(dot(normal, vec3(0.0, 0.0, 1.0)), 0.0, 1.0), 2.2);
-                        vec3 highlight = vec3(1.0) * fresnel * 0.6;
-                        vec3 color = refracted * 0.9 + highlight;
+                        float fresnel = pow(1.0 - clamp(dot(normal, vec3(0.0, 0.0, 1.0)), 0.0, 1.0), 2.0);
+                        vec3 tint = vec3(0.38, 0.015, 0.04);
+                        float sheen = pow(max(dot(normal, uLightDir), 0.0), 8.0) * 0.45;
+                        vec3 highlight = vec3(1.0) * (fresnel * 1.1 + sheen);
+                        vec3 color = refracted * tint + highlight;
 
-                        float alpha = 0.68 + fresnel * 0.22;
+                        float alpha = 0.9 + fresnel * 0.08;
                         gl_FragColor = vec4(color, alpha);
                     }
                 `
@@ -362,23 +460,110 @@
                 return geometry;
             };
 
-            const cubeSize = 1.8;
-            const cubeRadius = cubeSize / 14;
             const cube = new THREE.Mesh(
-                createRoundedBoxGeometry(cubeSize, cubeSize, cubeSize, cubeRadius, 10),
-                cubeMaterial
+                createRoundedBoxGeometry(cubeSize, cubeSize, cubeSize, cubeBevel, 8),
+                outerMaterial
             );
             scene.add(cube);
+
+            const pipMaterial = new THREE.MeshBasicMaterial({
+                color: 0xffffff,
+                toneMapped: false
+            });
+            const pipGeometry = new THREE.CylinderGeometry(pipInsertRadius, pipInsertRadius, pipDepth * 0.9, 24, 1, false);
+            const pipPos = pipGeometry.attributes.position;
+            const pipHalfDepth = (pipDepth * 0.9) * 0.5;
+            const concavity = pipDepth * 0.35;
+            for (let i = 0; i < pipPos.count; i++) {
+                const x = pipPos.getX(i);
+                const y = pipPos.getY(i);
+                const z = pipPos.getZ(i);
+                if (y > pipHalfDepth - 1e-4) {
+                    const r = Math.min(1, Math.sqrt(x * x + z * z) / pipInsertRadius);
+                    const indent = (1 - r * r) * concavity;
+                    pipPos.setY(i, y - indent);
+                }
+            }
+            pipPos.needsUpdate = true;
+            pipGeometry.computeVertexNormals();
+            const pipWallGeometry = new THREE.CylinderGeometry(pipHoleRadius, pipHoleRadius, pipDepth, 28, 1, true);
+            pipWallGeometry.scale(-1, 1, 1);
+            const pipWallMaterial = outerMaterial.clone();
+            pipWallMaterial.uniforms = THREE.UniformsUtils.clone(outerMaterial.uniforms);
+            pipWallMaterial.uniforms.uDisableHoles.value = 1;
+            const pipBevelThickness = pipHoleRadius * 0.14;
+            const pipBevelGeometry = new THREE.TorusGeometry(pipHoleRadius, pipBevelThickness, 12, 36);
+            const pipLayouts = {
+                1: [[0, 0]],
+                2: [[-pipOffset, -pipOffset], [pipOffset, pipOffset]],
+                3: [[-pipOffset, -pipOffset], [0, 0], [pipOffset, pipOffset]],
+                4: [[-pipOffset, -pipOffset], [pipOffset, -pipOffset], [-pipOffset, pipOffset], [pipOffset, pipOffset]],
+                5: [[-pipOffset, -pipOffset], [pipOffset, -pipOffset], [0, 0], [-pipOffset, pipOffset], [pipOffset, pipOffset]],
+                6: [[-pipOffset, -pipOffset], [-pipOffset, 0], [-pipOffset, pipOffset], [pipOffset, -pipOffset], [pipOffset, 0], [pipOffset, pipOffset]]
+            };
+
+            const addPip = (axis, dir, x, y) => {
+                const wall = new THREE.Mesh(pipWallGeometry, pipWallMaterial);
+                const bevel = new THREE.Mesh(pipBevelGeometry, pipWallMaterial);
+                const pip = new THREE.Mesh(pipGeometry, pipMaterial);
+                if (axis === 'z') {
+                    wall.rotation.x = Math.PI / 2;
+                    pip.rotation.x = Math.PI / 2;
+                    wall.position.set(x, y, (cubeSize * 0.5 - pipInset - pipDepth * 0.5) * dir);
+                    pip.position.set(x, y, (cubeSize * 0.5 - pipInset - pipDepth * 0.45) * dir);
+                    bevel.position.set(x, y, (cubeSize * 0.5 - pipInset + pipBevelThickness) * dir);
+                    if (dir < 0) {
+                        bevel.rotation.y = Math.PI;
+                    }
+                } else if (axis === 'y') {
+                    wall.position.set(x, (cubeSize * 0.5 - pipInset - pipDepth * 0.5) * dir, y);
+                    pip.position.set(x, (cubeSize * 0.5 - pipInset - pipDepth * 0.45) * dir, y);
+                    bevel.position.set(x, (cubeSize * 0.5 - pipInset + pipBevelThickness) * dir, y);
+                    bevel.rotation.x = dir > 0 ? -Math.PI / 2 : Math.PI / 2;
+                } else {
+                    wall.rotation.z = Math.PI / 2;
+                    pip.rotation.z = Math.PI / 2;
+                    wall.position.set((cubeSize * 0.5 - pipInset - pipDepth * 0.5) * dir, y, x);
+                    pip.position.set((cubeSize * 0.5 - pipInset - pipDepth * 0.45) * dir, y, x);
+                    bevel.position.set((cubeSize * 0.5 - pipInset + pipBevelThickness) * dir, y, x);
+                    bevel.rotation.y = dir > 0 ? Math.PI / 2 : -Math.PI / 2;
+                }
+                cube.add(wall);
+                cube.add(bevel);
+                cube.add(pip);
+            };
+
+            [
+                { axis: 'z', dir: 1, value: 1 },
+                { axis: 'z', dir: -1, value: 6 },
+                { axis: 'y', dir: 1, value: 2 },
+                { axis: 'y', dir: -1, value: 5 },
+                { axis: 'x', dir: 1, value: 3 },
+                { axis: 'x', dir: -1, value: 4 }
+            ].forEach((face) => {
+                pipLayouts[face.value].forEach(([px, py]) => {
+                    addPip(face.axis, face.dir, px, py);
+                });
+            });
 
             const resize = () => {
                 resizeGrid();
                 renderer.setSize(window.innerWidth, window.innerHeight);
                 camera.aspect = window.innerWidth / window.innerHeight;
                 camera.updateProjectionMatrix();
-                cubeMaterial.uniforms.uResolution.value.set(
+                outerMaterial.uniforms.uResolution.value.set(
                     window.innerWidth * window.devicePixelRatio,
                     window.innerHeight * window.devicePixelRatio
                 );
+                renderTarget.setSize(
+                    window.innerWidth * window.devicePixelRatio,
+                    window.innerHeight * window.devicePixelRatio
+                );
+                const distance = 6;
+                const height = 2 * Math.tan(THREE.MathUtils.degToRad(camera.fov * 0.5)) * distance;
+                const width = height * camera.aspect;
+                bgPlane.scale.set(width, height, 1);
+                bgPlane.position.z = -distance;
             };
 
             let lastTime = 0;
@@ -406,9 +591,14 @@
                 }
 
                 gridTexture.needsUpdate = true;
-                cubeMaterial.uniforms.uTime.value = now;
+                outerMaterial.uniforms.uTime.value = now;
                 cube.rotation.x = now * 0.35;
                 cube.rotation.y = now * 0.55;
+
+                renderer.setRenderTarget(renderTarget);
+                renderer.clear();
+                renderer.render(refractionScene, camera);
+                renderer.setRenderTarget(null);
                 renderer.render(scene, camera);
 
                 requestAnimationFrame(animate);
