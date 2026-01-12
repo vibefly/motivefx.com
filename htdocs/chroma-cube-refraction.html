@@ -331,6 +331,7 @@
                         float fresnel = pow(1.0 - clamp(dot(normal, vec3(0.0, 0.0, 1.0)), 0.0, 1.0), 2.2);
                         vec3 highlight = vec3(1.0) * fresnel * 0.6;
                         vec3 color = refracted * 0.9 + highlight;
+
                         float alpha = 0.68 + fresnel * 0.22;
                         gl_FragColor = vec4(color, alpha);
                     }
@@ -362,7 +363,7 @@
             };
 
             const cubeSize = 1.8;
-            const cubeRadius = cubeSize / 8;
+            const cubeRadius = cubeSize / 14;
             const cube = new THREE.Mesh(
                 createRoundedBoxGeometry(cubeSize, cubeSize, cubeSize, cubeRadius, 10),
                 cubeMaterial

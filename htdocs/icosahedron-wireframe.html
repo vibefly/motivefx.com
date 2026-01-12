@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Three.js Canvas | motiveFx</title>
+    <title>Icosahedron Wireframe | motiveFx</title>
     <link rel="stylesheet" href="styles.css">
     <style>
         html, body {
@@ -12,10 +12,35 @@
             background: #000;
             overflow: hidden;
             font-family: var(--font-primary);
+            color: #e9f7ff;
         }
 
         canvas {
             display: block;
+        }
+
+        .overlay {
+            position: fixed;
+            top: 72px;
+            left: 0;
+            width: 100%;
+            padding: 22px;
+            pointer-events: none;
+            background: linear-gradient(180deg, rgba(0, 0, 0, 0.55), rgba(0, 0, 0, 0));
+        }
+
+        .title {
+            margin: 0 0 6px 0;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+            font-size: clamp(18px, 3vw, 26px);
+            color: #8fe8ff;
+        }
+
+        .subtitle {
+            margin: 0;
+            font-size: clamp(14px, 2.3vw, 17px);
+            color: #bfeeff;
         }
     </style>
 </head>
@@ -37,6 +62,11 @@
             </ul>
         </nav>
     </header>
+
+    <div class="overlay">
+        <p class="title">Icosahedron Wireframe</p>
+        <p class="subtitle">Minimalist study of a spinning wireframe icosahedron with crisp edges and a neon core.</p>
+    </div>
 
     <script src="js/three.min.r134.js"></script>
     <script>

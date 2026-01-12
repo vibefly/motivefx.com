@@ -8,46 +8,39 @@
     <style>
         html, body {
             margin: 0;
-            padding: 0;
-            width: 100%;
             height: 100%;
-            background: #05070d;
-            font-family: var(--font-primary);
-            color: var(--color-text-primary);
+            background: #000;
             overflow: hidden;
+            font-family: var(--font-primary);
+            color: #e9f7ff;
         }
+
         canvas {
-            position: absolute;
-            top: 0;
-            left: 0;
             display: block;
+        }
+
+        .overlay {
+            position: fixed;
+            top: 72px;
+            left: 0;
             width: 100%;
-            height: 100%;
-            z-index: 0;
+            padding: 22px;
+            pointer-events: none;
+            background: linear-gradient(180deg, rgba(0, 0, 0, 0.55), rgba(0, 0, 0, 0));
         }
-        #overlay {
-            position: absolute;
-            top: 96px;
-            left: 16px;
-            padding: 14px 16px;
-            background: rgba(0, 0, 0, 0.55);
-            border: 1px solid var(--color-border-card);
-            border-radius: 10px;
-            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.45);
-            max-width: 320px;
-            z-index: 2;
+
+        .title {
+            margin: 0 0 6px 0;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+            font-size: clamp(18px, 3vw, 26px);
+            color: #8fe8ff;
         }
-        #overlay h1 {
-            margin: 0 0 8px 0;
-            font-size: 18px;
-            color: var(--color-accent-neon);
-            letter-spacing: 0.06em;
-        }
-        #overlay p {
+
+        .subtitle {
             margin: 0;
-            font-size: 13px;
-            line-height: 1.45;
-            color: var(--color-text-secondary);
+            font-size: clamp(14px, 2.3vw, 17px);
+            color: #bfeeff;
         }
     </style>
 </head>
@@ -70,9 +63,9 @@
         </nav>
     </header>
 
-    <div id="overlay">
-        <h1>Curved Dotted Tunnel</h1>
-        <p>Endless tunnel built from neon dots that flow, wobble, and twist toward you.</p>
+    <div class="overlay">
+        <p class="title">Curved Dotted Tunnel</p>
+        <p class="subtitle">Endless tunnel built from neon dots that flow, wobble, and twist toward you.</p>
     </div>
 
     <canvas id="tunnel-canvas"></canvas>
