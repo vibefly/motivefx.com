@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ocean Run | motiveFx</title>
+    <title>Mountain Run | motiveFx</title>
     <link rel="stylesheet" href="styles.css">
     <style>
         html, body {
@@ -64,8 +64,8 @@
     </header>
 
     <div class="overlay">
-        <p class="title">Ocean Run</p>
-        <p class="subtitle">Low-altitude run over rolling swells with drifting haze and neon edge light.</p>
+        <p class="title">Mountain Run</p>
+        <p class="subtitle">Low-altitude run over jagged ridges with drifting haze and neon edge light.</p>
     </div>
 
     <canvas id="mountain-canvas"></canvas>
@@ -180,12 +180,13 @@
                 return nx0 + (nx1 - nx0) * v;
             }
 
-            function heightAt(x, z, t) {
-                const ridge = triWave(z * 0.05 - t * 0.9) * 10.4;
-                const wave = triWave(x * 0.05 + t * 0.5) * 7.0;
-                const cross = triWave((x * 0.04 + z * 0.02) + t * 0.3) * 8.1;
-                const peaks = Math.pow(Math.abs(triWave((x * 0.034) + (z * 0.018) - t * 0.2)), 2.15) * 12.6;
-                const noise = (valueNoise(x * noiseScale, z * noiseScale) - 0.5) * noiseAmp;
+            function heightAt(x, z, travel) {
+                const zTravel = z - travel;
+                const ridge = triWave(zTravel * 0.05) * 10.4;
+                const wave = triWave(x * 0.05) * 7.0;
+                const cross = triWave((x * 0.04 + zTravel * 0.02)) * 8.1;
+                const peaks = Math.pow(Math.abs(triWave((x * 0.034) + (zTravel * 0.018))), 2.15) * 12.6;
+                const noise = (valueNoise(x * noiseScale, zTravel * noiseScale) - 0.5) * noiseAmp;
                 const edge = Math.min(1, Math.abs(x) / (width * 0.5));
                 const edgeFalloff = 1 - Math.pow(edge, 1.4);
                 return (ridge + wave + cross + peaks + noise) * (0.35 + edgeFalloff);
@@ -193,7 +194,8 @@
 
             const clock = new THREE.Clock();
             let offset = 0;
-            const speed = 32;
+            let travel = 0;
+            const speed = 44;
             const travelLength = tileCount * tileLength;
             let camX = 0;
             let camY = 16;
@@ -204,12 +206,12 @@
             const noiseScale = 0.06;
             const noiseAmp = 6.2;
 
-            function updateTile(geometry, time, zOffset, updateNormals) {
+            function updateTile(geometry, travel, zOffset, updateNormals) {
                 const pos = geometry.attributes.position;
                 for (let i = 0; i < pos.count; i++) {
                     const x = pos.getX(i);
                     const z = pos.getZ(i) + zOffset;
-                    const height = heightAt(x, z, time);
+                    const height = heightAt(x, z, travel);
                     pos.setY(i, height);
                 }
                 pos.needsUpdate = true;
@@ -220,6 +222,7 @@
 
             function animate() {
                 const dt = clock.getDelta();
+                travel += dt * speed;
                 offset = (offset + dt * speed) % travelLength;
                 const time = clock.elapsedTime;
 
@@ -228,27 +231,27 @@
                     if (zPos > tileLength) zPos -= travelLength;
                     tile.mesh.position.z = zPos;
                     tile.wire.position.z = zPos;
-                    updateTile(tile.mesh.geometry, time, zPos, true);
-                    updateTile(tile.wire.geometry, time, zPos, false);
+                    updateTile(tile.mesh.geometry, travel, zPos, true);
+                    updateTile(tile.wire.geometry, travel, zPos, false);
                 });
 
-                const sway = Math.sin(time * 0.4) * 6;
-                const bob = Math.sin(time * 1.2) * 1.2;
+                const sway = 0;
+                const bob = 0;
                 const camZ = 18;
-                const buffer = 12.5;
+                const buffer = 16;
+                const lookAhead = 26;
                 prevCamX = camX;
                 prevCamY = camY;
                 camX += (sway - camX) * 0.08;
-                const terrainHeight = heightAt(camX, camZ, time);
+                const terrainHeight = heightAt(camX, camZ, travel);
+                const terrainAhead = heightAt(camX, camZ - lookAhead, travel);
+                const terrainBlend = terrainHeight * 0.6 + terrainAhead * 0.4;
                 const desiredY = 16 + bob;
-                const targetY = Math.max(desiredY, terrainHeight + buffer);
-                camY += (targetY - camY) * 0.08;
+                const targetY = Math.max(desiredY, terrainBlend + buffer);
+                camY += (targetY - camY) * 0.06;
                 camera.position.set(camX, camY, camZ);
-                const dx = camX - prevCamX;
-                const targetRoll = THREE.MathUtils.clamp(dx * -0.1, -0.28, 0.28);
-                rollSmooth += (targetRoll - rollSmooth) * 0.08;
-                camera.lookAt(0, 6 + bob * 0.3, -30);
-                camera.rotation.z = rollSmooth;
+                camera.lookAt(0, camY - 10, -30);
+                camera.rotation.z = 0;
 
                 scene.rotation.z = Math.sin(time * 0.35) * 0.035;
                 renderer.render(scene, camera);
