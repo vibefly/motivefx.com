@@ -6,24 +6,30 @@
     <title>Chroma Grid Wipe | motiveFx</title>
     <link rel="stylesheet" href="styles.css">
     <style>
-        :root {
-            color-scheme: light;
-        }
-
         html, body {
             margin: 0;
-            padding: 0;
-            width: 100%;
             height: 100%;
-            background: #0e0f12;
-            font-family: var(--font-primary);
+            background: #000;
             overflow: hidden;
+            font-family: var(--font-primary);
+            color: #e9f7ff;
         }
 
         canvas {
             display: block;
-            width: 100%;
-            height: 100%;
+            pointer-events: none;
+        }
+
+        #main-header,
+        #main-header * {
+            pointer-events: auto;
+        }
+        #main-header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 1000;
         }
 
         .overlay {
@@ -31,29 +37,29 @@
             top: 72px;
             left: 0;
             width: 100%;
-            padding: 24px;
+            padding: 22px;
             pointer-events: none;
-            background: linear-gradient(180deg, rgba(14, 15, 18, 0.85), rgba(14, 15, 18, 0));
+            background: linear-gradient(180deg, rgba(0, 0, 0, 0.55), rgba(0, 0, 0, 0));
         }
 
         .title {
-            font-size: clamp(20px, 3vw, 30px);
-            letter-spacing: 0.2em;
-            text-transform: uppercase;
-            color: #f6f4f1;
             margin: 0 0 6px 0;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+            font-size: clamp(18px, 3vw, 26px);
+            color: #8fe8ff;
         }
 
         .subtitle {
             margin: 0;
-            font-size: clamp(14px, 2.4vw, 18px);
-            color: #c6c2bf;
+            font-size: clamp(14px, 2.3vw, 17px);
+            color: #bfeeff;
         }
     </style>
 </head>
-<body class="static-page vis-page no-js">
+<body class="static-page vis-page">
     <header id="main-header">
-        <a href="index.html" class="logo">motiveFx</a>
+        <a href="index.html" class="logo" data-link-only="true">motiveFx</a>
         <button class="nav-toggle" aria-expanded="false" aria-controls="main-nav">
             <span class="sr-only">Toggle navigation</span>
             <span class="nav-toggle-bar"></span>
@@ -275,6 +281,18 @@
 
             resize();
             requestAnimationFrame(animate);
+        })();
+    </script>
+    <script>
+        (() => {
+            const navToggle = document.querySelector(".nav-toggle");
+            const mainNav = document.getElementById("main-nav");
+            if (navToggle && mainNav) {
+                navToggle.addEventListener("click", () => {
+                    const isOpen = mainNav.classList.toggle("is-open");
+                    navToggle.setAttribute("aria-expanded", String(isOpen));
+                });
+            }
         })();
     </script>
 </body>
