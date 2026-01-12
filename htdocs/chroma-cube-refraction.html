@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Chroma Cube Refraction | motiveFx</title>
+    <title>Refracting Dice | motiveFx</title>
     <link rel="stylesheet" href="styles.css">
     <style>
         :root {
@@ -82,8 +82,8 @@
     </header>
 
     <div class="overlay">
-        <p class="title">Chroma Cube Refraction</p>
-        <p class="subtitle">A vibrant grid breathes behind a glass cube refracting the palette.</p>
+        <p class="title">Refracting Dice</p>
+        <p class="subtitle">A candy-red dice refracts the shifting grid with beveled pips.</p>
     </div>
 
     <canvas id="grid-canvas"></canvas>
@@ -512,9 +512,6 @@
                     wall.position.set(x, y, (cubeSize * 0.5 - pipInset - pipDepth * 0.5) * dir);
                     pip.position.set(x, y, (cubeSize * 0.5 - pipInset - pipDepth * 0.45) * dir);
                     bevel.position.set(x, y, (cubeSize * 0.5 - pipInset + pipBevelThickness) * dir);
-                    if (dir < 0) {
-                        bevel.rotation.y = Math.PI;
-                    }
                 } else if (axis === 'y') {
                     wall.position.set(x, (cubeSize * 0.5 - pipInset - pipDepth * 0.5) * dir, y);
                     pip.position.set(x, (cubeSize * 0.5 - pipInset - pipDepth * 0.45) * dir, y);
