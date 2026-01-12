@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mountain Flight | motiveFx</title>
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        html, body {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 100%;
+            background: #04060b;
+            font-family: var(--font-primary);
+            color: var(--color-text-primary);
+            overflow: hidden;
+        }
+        canvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            display: block;
+            width: 100%;
+            height: 100%;
+            z-index: 0;
+        }
+        #overlay {
+            position: absolute;
+            top: 96px;
+            left: 16px;
+            padding: 14px 16px;
+            background: rgba(3, 6, 12, 0.6);
+            border: 1px solid rgba(120, 180, 255, 0.25);
+            border-radius: 10px;
+            box-shadow: 0 8px 18px rgba(0, 0, 0, 0.45);
+            max-width: 320px;
+            z-index: 2;
+        }
+        #overlay h1 {
+            margin: 0 0 8px 0;
+            font-size: 18px;
+            color: var(--color-accent-neon);
+            letter-spacing: 0.06em;
+        }
+        #overlay p {
+            margin: 0;
+            font-size: 13px;
+            line-height: 1.45;
+            color: var(--color-text-secondary);
+        }
+    </style>
+</head>
+<body class="static-page vis-page">
+    <header id="main-header">
+        <a href="index.html" class="logo">motiveFx</a>
+        <button class="nav-toggle" aria-expanded="false" aria-controls="main-nav">
+            <span class="sr-only">Toggle navigation</span>
+            <span class="nav-toggle-bar"></span>
+            <span class="nav-toggle-bar"></span>
+            <span class="nav-toggle-bar"></span>
+        </button>
+        <nav id="main-nav">
+            <ul>
+                <li><a href="index.html#about">About</a></li>
+                <li><a href="index.html#services">Services</a></li>
+                <li><a href="index.html#studies">Studies</a></li>
+                <li><a href="index.html#contact">Contact</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <div id="overlay">
+        <h1>Mountain Flight</h1>
+        <p>Low-altitude flyover across rolling ridges with drifting haze and neon edge light.</p>
+    </div>
+
+    <canvas id="mountain-canvas"></canvas>
+
+    <script src="js/three.min.r134.js"></script>
+    <script>
+        (() => {
+            const canvas = document.getElementById('mountain-canvas');
+            const renderer = new THREE.WebGLRenderer({ canvas, antialias: true });
+            renderer.setPixelRatio(window.devicePixelRatio);
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            renderer.setClearColor(0x04060b, 1);
+
+            const scene = new THREE.Scene();
+            scene.fog = new THREE.Fog(0x04060b, 18, 140);
+
+            const camera = new THREE.PerspectiveCamera(70, window.innerWidth / window.innerHeight, 0.1, 400);
+            camera.position.set(0, 18, 18);
+
+            const ambient = new THREE.AmbientLight(0x6ea4ff, 0.45);
+            scene.add(ambient);
+
+            const keyLight = new THREE.DirectionalLight(0x8bd4ff, 0.9);
+            keyLight.position.set(30, 40, 10);
+            scene.add(keyLight);
+
+            const rimLight = new THREE.DirectionalLight(0x3a5cff, 0.55);
+            rimLight.position.set(-20, 24, -40);
+            scene.add(rimLight);
+
+            const terrainGroup = new THREE.Group();
+            scene.add(terrainGroup);
+
+            const tileCount = 4;
+            const tileLength = 120;
+            const width = 220;
+            const depth = 120;
+            const segmentsX = 120;
+            const segmentsZ = 80;
+
+            const baseGeometry = new THREE.PlaneGeometry(width, depth, segmentsX, segmentsZ);
+            baseGeometry.rotateX(-Math.PI / 2);
+
+            const terrainMaterial = new THREE.MeshStandardMaterial({
+                color: 0x0b1320,
+                roughness: 0.9,
+                metalness: 0.1,
+                flatShading: true
+            });
+            const wireMaterial = new THREE.LineBasicMaterial({
+                color: 0x4fd6ff,
+                transparent: true,
+                opacity: 0.6
+            });
+
+            const tiles = [];
+            for (let i = 0; i < tileCount; i++) {
+                const meshGeom = baseGeometry.clone();
+                const wireGeom = baseGeometry.clone();
+                const gridIndex = [];
+                const vertsX = segmentsX + 1;
+                const vertsZ = segmentsZ + 1;
+                for (let z = 0; z < vertsZ; z++) {
+                    for (let x = 0; x < segmentsX; x++) {
+                        const a = z * vertsX + x;
+                        gridIndex.push(a, a + 1);
+                    }
+                }
+                for (let z = 0; z < segmentsZ; z++) {
+                    for (let x = 0; x < vertsX; x++) {
+                        const a = z * vertsX + x;
+                        gridIndex.push(a, a + vertsX);
+                    }
+                }
+                wireGeom.setIndex(gridIndex);
+                const mesh = new THREE.Mesh(meshGeom, terrainMaterial.clone());
+                const wire = new THREE.LineSegments(wireGeom, wireMaterial.clone());
+                mesh.position.z = -i * tileLength;
+                wire.position.z = -i * tileLength;
+                terrainGroup.add(mesh);
+                terrainGroup.add(wire);
+                tiles.push({ mesh, wire });
+            }
+
+            function triWave(value) {
+                return (2 / Math.PI) * Math.asin(Math.sin(value));
+            }
+
+            function smoothstep(t) {
+                return t * t * (3 - 2 * t);
+            }
+
+            function hash2(x, z) {
+                const s = Math.sin(x * 127.1 + z * 311.7 + noiseSeed) * 43758.5453;
+                return s - Math.floor(s);
+            }
+
+            function valueNoise(x, z) {
+                const xi = Math.floor(x);
+                const zi = Math.floor(z);
+                const xf = x - xi;
+                const zf = z - zi;
+                const u = smoothstep(xf);
+                const v = smoothstep(zf);
+
+                const n00 = hash2(xi, zi);
+                const n10 = hash2(xi + 1, zi);
+                const n01 = hash2(xi, zi + 1);
+                const n11 = hash2(xi + 1, zi + 1);
+                const nx0 = n00 + (n10 - n00) * u;
+                const nx1 = n01 + (n11 - n01) * u;
+                return nx0 + (nx1 - nx0) * v;
+            }
+
+            function heightAt(x, z, t) {
+                const ridge = triWave(z * 0.05 - t * 0.9) * 10.4;
+                const wave = triWave(x * 0.05 + t * 0.5) * 7.0;
+                const cross = triWave((x * 0.04 + z * 0.02) + t * 0.3) * 8.1;
+                const peaks = Math.pow(Math.abs(triWave((x * 0.034) + (z * 0.018) - t * 0.2)), 2.15) * 12.6;
+                const noise = (valueNoise(x * noiseScale, z * noiseScale) - 0.5) * noiseAmp;
+                const edge = Math.min(1, Math.abs(x) / (width * 0.5));
+                const edgeFalloff = 1 - Math.pow(edge, 1.4);
+                return (ridge + wave + cross + peaks + noise) * (0.35 + edgeFalloff);
+            }
+
+            const clock = new THREE.Clock();
+            let offset = 0;
+            const speed = 32;
+            const travelLength = tileCount * tileLength;
+            let camX = 0;
+            let camY = 16;
+            let prevCamX = 0;
+            let prevCamY = 16;
+            let rollSmooth = 0;
+            const noiseSeed = Math.random() * 1000;
+            const noiseScale = 0.06;
+            const noiseAmp = 6.2;
+
+            function updateTile(geometry, time, zOffset, updateNormals) {
+                const pos = geometry.attributes.position;
+                for (let i = 0; i < pos.count; i++) {
+                    const x = pos.getX(i);
+                    const z = pos.getZ(i) + zOffset;
+                    const height = heightAt(x, z, time);
+                    pos.setY(i, height);
+                }
+                pos.needsUpdate = true;
+                if (updateNormals) {
+                    geometry.computeVertexNormals();
+                }
+            }
+
+            function animate() {
+                const dt = clock.getDelta();
+                offset = (offset + dt * speed) % travelLength;
+                const time = clock.elapsedTime;
+
+                tiles.forEach((tile, idx) => {
+                    let zPos = -idx * tileLength + offset;
+                    if (zPos > tileLength) zPos -= travelLength;
+                    tile.mesh.position.z = zPos;
+                    tile.wire.position.z = zPos;
+                    updateTile(tile.mesh.geometry, time, zPos, true);
+                    updateTile(tile.wire.geometry, time, zPos, false);
+                });
+
+                const sway = Math.sin(time * 0.4) * 6;
+                const bob = Math.sin(time * 1.2) * 1.2;
+                const camZ = 18;
+                const buffer = 12.5;
+                prevCamX = camX;
+                prevCamY = camY;
+                camX += (sway - camX) * 0.08;
+                const terrainHeight = heightAt(camX, camZ, time);
+                const desiredY = 16 + bob;
+                const targetY = Math.max(desiredY, terrainHeight + buffer);
+                camY += (targetY - camY) * 0.08;
+                camera.position.set(camX, camY, camZ);
+                const dx = camX - prevCamX;
+                const targetRoll = THREE.MathUtils.clamp(dx * -0.1, -0.28, 0.28);
+                rollSmooth += (targetRoll - rollSmooth) * 0.08;
+                camera.lookAt(0, 6 + bob * 0.3, -30);
+                camera.rotation.z = rollSmooth;
+
+                scene.rotation.z = Math.sin(time * 0.35) * 0.035;
+                renderer.render(scene, camera);
+                requestAnimationFrame(animate);
+            }
+            animate();
+
+            window.addEventListener('resize', () => {
+                renderer.setSize(window.innerWidth, window.innerHeight);
+                camera.aspect = window.innerWidth / window.innerHeight;
+                camera.updateProjectionMatrix();
+            });
+
+            const navToggle = document.querySelector(".nav-toggle");
+            const mainNav = document.getElementById("main-nav");
+            if (navToggle && mainNav) {
+                navToggle.addEventListener("click", () => {
+                    const isOpen = mainNav.classList.toggle("is-open");
+                    navToggle.setAttribute("aria-expanded", String(isOpen));
+                });
+            }
+        })();
+    </script>
+</body>
+</html>
