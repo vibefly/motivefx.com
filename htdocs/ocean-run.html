@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ocean Run | motiveFx</title>
+    <title>Ocean Squall | motiveFx</title>
     <link rel="stylesheet" href="styles.css">
     <style>
         html, body {
@@ -114,8 +114,8 @@
     </header>
 
     <div class="overlay">
-        <p class="title">Ocean Run</p>
-        <p class="subtitle">Low-altitude run over rolling swells with drifting haze and neon edge light.</p>
+        <p class="title">Ocean Squall</p>
+        <p class="subtitle">Low-altitude flight through an ocean storm with rain, lightning bursts, sound, and neon edge light.</p>
     </div>
     <div class="storm-controls">
         <button id="sound-toggle" type="button">Enable Storm Sound</button>
@@ -270,7 +270,6 @@
             const rainCount = 420;
             const lightningBolts = [];
             let boltSprite = null;
-            let lastBoltPos = null;
             let lightningFlash = 0;
             let lightningNext = 1 + Math.random() * 5;
             let lightningBurst = 0;
@@ -337,14 +336,13 @@
                     boltSprite.ttl = 0.22 + Math.random() * 0.16;
                     return;
                 }
-                const distanceScale = 0.38;
-                const horizonY = window.innerHeight * 0.1;
+                const distanceScale = 0.55;
+                const horizonY = window.innerHeight * 0.12;
                 const segments = 7 + Math.floor(Math.random() * 5);
                 const points = [];
                 let x = Math.random() * window.innerWidth;
-                let y = horizonY + Math.random() * window.innerHeight * 0.06;
+                let y = horizonY + Math.random() * window.innerHeight * 0.08;
                 points.push([x, y]);
-                lastBoltPos = { x, y };
                 for (let i = 0; i < segments; i++) {
                     x += (Math.random() - 0.5) * 90 * distanceScale;
                     y += (30 + Math.random() * 45) * distanceScale;
@@ -370,8 +368,6 @@
             function drawBolts() {
                 if (!lightningBolts.length) return;
                 stormCtx.lineWidth = 2;
-                stormCtx.shadowBlur = 18;
-                stormCtx.shadowColor = 'rgba(80, 160, 255, 0.7)';
                 stormCtx.strokeStyle = 'rgba(230, 240, 255, 0.9)';
                 for (let i = 0; i < lightningBolts.length; i++) {
                     const bolt = lightningBolts[i];
@@ -387,7 +383,6 @@
                     stormCtx.stroke();
                 }
                 stormCtx.globalAlpha = 1;
-                stormCtx.shadowBlur = 0;
             }
 
             function createNoiseBuffer(ctx, seconds) {
@@ -590,22 +585,7 @@
                     const flash = lightningFlash;
                     ambient.intensity = baseAmbient + flash * 0.8;
                     keyLight.intensity = baseKey + flash * 2.2;
-                    const glowX = lastBoltPos ? lastBoltPos.x : window.innerWidth * 0.5;
-                    const glowY = lastBoltPos ? lastBoltPos.y : window.innerHeight * 0.12;
-                    const skyGlow = stormCtx.createRadialGradient(
-                        glowX,
-                        glowY,
-                        0,
-                        glowX,
-                        glowY,
-                        window.innerHeight * 0.7
-                    );
-                    skyGlow.addColorStop(0, `rgba(210, 235, 255, ${0.65 * flash})`);
-                    skyGlow.addColorStop(0.35, `rgba(170, 210, 255, ${0.3 * flash})`);
-                    skyGlow.addColorStop(1, 'rgba(160, 200, 255, 0)');
-                    stormCtx.fillStyle = skyGlow;
-                    stormCtx.fillRect(0, 0, window.innerWidth, window.innerHeight);
-                    stormCtx.fillStyle = `rgba(255,255,255,${0.28 * flash})`;
+                    stormCtx.fillStyle = `rgba(255,255,255,${0.15 * flash})`;
                     stormCtx.fillRect(0, 0, window.innerWidth, window.innerHeight);
                 } else {
                     ambient.intensity = baseAmbient;
