@@ -218,7 +218,7 @@
 
         _generateSpherePositions() {
             const positions = new Float32Array(this.particleCount * 3);
-            const radius = 60;
+            const radius = 46;
             const offset = 2 / this.particleCount;
             const increment = Math.PI * (3 - Math.sqrt(5));
 
