@@ -130,36 +130,92 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const observeSectionsOnScroll = () => {
         const sections = document.querySelectorAll('[data-morph-shape]');
-        if (!sections.length || typeof IntersectionObserver === 'undefined') {
+        if (!sections.length) {
             return;
         }
 
         let activeShape = null;
-        const observer = new IntersectionObserver((entries) => {
-            const visible = entries
-                .filter(entry => entry.isIntersecting)
-                .sort((a, b) => a.boundingClientRect.top - b.boundingClientRect.top);
+        if (typeof IntersectionObserver !== 'undefined') {
+            const observer = new IntersectionObserver((entries) => {
+                const visible = entries
+                    .filter(entry => entry.isIntersecting)
+                    .sort((a, b) => b.intersectionRatio - a.intersectionRatio);
 
-            if (!visible.length) {
-                return;
-            }
+                if (!visible.length) {
+                    return;
+                }
 
-            const candidate = visible[0].target;
-            const shape = candidate.dataset.morphShape;
-            if (shape && shape !== activeShape && morphController) {
-                activeShape = shape;
-                morphController.morphTo(shape);
-            }
-        }, {
-            threshold: 0.45,
-        });
+                const candidate = visible[0].target;
+                const shape = candidate.dataset.morphShape;
+                if (shape && shape !== activeShape && morphController) {
+                    activeShape = shape;
+                    morphController.morphTo(shape);
+                }
+            }, {
+                threshold: [0.2, 0.4, 0.6],
+                rootMargin: '-10% 0px -20% 0px',
+            });
 
-        sections.forEach(section => observer.observe(section));
+            sections.forEach(section => observer.observe(section));
+        }
 
         const initialHash = window.location.hash;
         if (initialHash) {
             morphToSectionShape(initialHash);
         }
+
+        let scrollTicking = false;
+        const handleScroll = () => {
+            if (scrollTicking) {
+                return;
+            }
+            scrollTicking = true;
+            requestAnimationFrame(() => {
+                scrollTicking = false;
+                if (!morphController) {
+                    return;
+                }
+                const viewportHeight = window.innerHeight;
+                let activeSection = null;
+                let maxRatio = 0;
+                sections.forEach((section) => {
+                    const rect = section.getBoundingClientRect();
+                    const visible = Math.min(rect.bottom, viewportHeight) - Math.max(rect.top, 0);
+                    if (visible <= 0) {
+                        return;
+                    }
+                    const ratio = visible / Math.max(rect.height, 1);
+                    if (ratio > maxRatio) {
+                        maxRatio = ratio;
+                        activeSection = section;
+                    }
+                });
+                if (!activeSection) {
+                    const markerY = viewportHeight * 0.45;
+                    let closest = null;
+                    let closestDist = Infinity;
+                    sections.forEach((section) => {
+                        const rect = section.getBoundingClientRect();
+                        const sectionCenter = rect.top + rect.height * 0.5;
+                        const dist = Math.abs(sectionCenter - markerY);
+                        if (dist < closestDist) {
+                            closestDist = dist;
+                            closest = section;
+                        }
+                    });
+                    activeSection = closest;
+                }
+                if (activeSection && activeSection.dataset.morphShape) {
+                    const shape = activeSection.dataset.morphShape;
+                    if (shape !== activeShape) {
+                        activeShape = shape;
+                        morphController.morphTo(shape);
+                    }
+                }
+            });
+        };
+        window.addEventListener('scroll', handleScroll, { passive: true });
+        handleScroll();
     };
 
     initMorphingDots();
