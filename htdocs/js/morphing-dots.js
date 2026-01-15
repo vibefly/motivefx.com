@@ -337,35 +337,44 @@
 
         _generateCubePositions() {
             const positions = new Float32Array(this.particleCount * 3);
-            const size = 120;
+            const size = 70;
             let ptr = 0;
 
-            const add = (x, y, z, jitter = 1.5) => {
+            const add = (x, y, z) => {
                 if (ptr >= positions.length) return;
-                positions[ptr] = x + (Math.random() - 0.5) * jitter;
-                positions[ptr + 1] = y + (Math.random() - 0.5) * jitter;
-                positions[ptr + 2] = z + (Math.random() - 0.5) * jitter;
+                positions[ptr] = x;
+                positions[ptr + 1] = y;
+                positions[ptr + 2] = z;
                 ptr += 3;
             };
 
-            const faceParticles = Math.floor(this.particleCount / 6);
+            const half = size / 2;
+            const faceParticles = Math.ceil(this.particleCount / 6);
+            const gridCount = Math.max(6, Math.floor(Math.sqrt(faceParticles)));
+            const step = size / (gridCount - 1);
+            const gridPoints = [];
             const faces = [
-                (i, n) => add(-size / 2, -size / 2 + (i / n) * size, -size / 2 + ((i * 3) % n) / n * size),
-                (i, n) => add(size / 2, -size / 2 + (i / n) * size, -size / 2 + ((i * 3) % n) / n * size),
-                (i, n) => add(-size / 2 + (i / n) * size, size / 2, -size / 2 + ((i * 3) % n) / n * size),
-                (i, n) => add(-size / 2 + (i / n) * size, -size / 2, -size / 2 + ((i * 3) % n) / n * size),
-                (i, n) => add(-size / 2 + (i / n) * size, -size / 2 + ((i * 3) % n) / n * size, size / 2),
-                (i, n) => add(-size / 2 + (i / n) * size, -size / 2 + ((i * 3) % n) / n * size, -size / 2),
+                (u, v) => [-half + u, -half + v, half],
+                (u, v) => [-half + u, -half + v, -half],
+                (u, v) => [half, -half + u, -half + v],
+                (u, v) => [-half, -half + u, -half + v],
+                (u, v) => [-half + u, half, -half + v],
+                (u, v) => [-half + u, -half, -half + v],
             ];
 
             faces.forEach(face => {
-                for (let i = 0; i < faceParticles && ptr < positions.length; i += 1) {
-                    face(i, faceParticles);
+                for (let i = 0; i < gridCount && ptr < positions.length; i += 1) {
+                    for (let j = 0; j < gridCount && ptr < positions.length; j += 1) {
+                        const point = face(i * step, j * step);
+                        add(point[0], point[1], point[2]);
+                        gridPoints.push(point);
+                    }
                 }
             });
 
             while (ptr < positions.length) {
-                add((Math.random() - 0.5) * size, (Math.random() - 0.5) * size, (Math.random() - 0.5) * size, 3);
+                const point = gridPoints[ptr / 3 % gridPoints.length];
+                add(point[0], point[1], point[2]);
             }
 
             return positions;

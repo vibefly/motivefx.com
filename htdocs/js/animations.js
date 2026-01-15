@@ -1,6 +1,9 @@
 document.addEventListener('DOMContentLoaded', () => {
     document.body.classList.remove('no-js');
     let morphController = null;
+    let activeShape = null;
+    let isNavScroll = false;
+    let navTargetId = null;
     const heroCanvas = document.querySelector('#hero-animation-canvas');
 
     const supportsWebGL = () => {
@@ -54,13 +57,18 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     };
 
-    const morphToSectionShape = (hash) => {
+    const morphToSectionShape = (hash, skipLock = false) => {
         if (!morphController || !hash || hash.length <= 1) {
             return;
         }
         const targetElement = document.querySelector(hash);
         if (targetElement && targetElement.dataset.morphShape) {
-            morphController.morphTo(targetElement.dataset.morphShape);
+            if (!skipLock) {
+                isNavScroll = true;
+                navTargetId = targetElement.id || null;
+            }
+            activeShape = targetElement.dataset.morphShape;
+            morphController.morphTo(activeShape);
         }
     };
 
@@ -79,11 +87,18 @@ document.addEventListener('DOMContentLoaded', () => {
         });
 
         const scrollToTop = () => {
+            isNavScroll = true;
+            navTargetId = 'hero';
+            morphToSectionShape('#hero', true);
             if (typeof gsap !== 'undefined' && typeof ScrollToPlugin !== 'undefined') {
                 gsap.to(window, {
                     duration: 1.8,
                     scrollTo: 0,
                     ease: 'power2.inOut',
+                    onComplete: () => {
+                        isNavScroll = false;
+                        navTargetId = null;
+                    },
                 });
             } else {
                 window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -134,9 +149,22 @@ document.addEventListener('DOMContentLoaded', () => {
             return;
         }
 
-        let activeShape = null;
         if (typeof IntersectionObserver !== 'undefined') {
             const observer = new IntersectionObserver((entries) => {
+                if (isNavScroll && navTargetId) {
+                    const target = document.getElementById(navTargetId);
+                    if (target) {
+                        const rect = target.getBoundingClientRect();
+                        const markerY = viewportHeight * 0.45;
+                        if (rect.top <= markerY && rect.bottom >= markerY) {
+                            isNavScroll = false;
+                            navTargetId = null;
+                        }
+                    }
+                    if (isNavScroll) {
+                        return;
+                    }
+                }
                 const visible = entries
                     .filter(entry => entry.isIntersecting)
                     .sort((a, b) => b.intersectionRatio - a.intersectionRatio);
@@ -147,10 +175,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
                 const candidate = visible[0].target;
                 const shape = candidate.dataset.morphShape;
-                if (shape && shape !== activeShape && morphController) {
-                    activeShape = shape;
-                    morphController.morphTo(shape);
-                }
+            if (shape && shape !== activeShape && morphController) {
+                activeShape = shape;
+                morphController.morphTo(shape);
+            }
             }, {
                 threshold: [0.2, 0.4, 0.6],
                 rootMargin: '-10% 0px -20% 0px',
@@ -173,6 +201,9 @@ document.addEventListener('DOMContentLoaded', () => {
             requestAnimationFrame(() => {
                 scrollTicking = false;
                 if (!morphController) {
+                    return;
+                }
+                if (isNavScroll) {
                     return;
                 }
                 const viewportHeight = window.innerHeight;
@@ -261,7 +292,11 @@ document.addEventListener('DOMContentLoaded', () => {
                             duration: 1.8, // slower scroll duration
                             scrollTo: targetElement,
                             ease: "power2.inOut", // Elegant easing function
-                            onComplete: () => history.pushState(null, null, hash)
+                            onComplete: () => {
+                                history.pushState(null, null, hash);
+                                isNavScroll = false;
+                                navTargetId = null;
+                            }
                         });
                     }
                 }
