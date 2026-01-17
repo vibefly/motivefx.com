@@ -40,6 +40,18 @@ h2 {
     text-align: center;
     margin-bottom: 2rem;
 }
+.vr-badge {
+    display: inline-block;
+    margin-left: 0.5rem;
+    padding: 0.1rem 0.45rem;
+    border: 1px solid var(--color-accent-neon);
+    border-radius: 3px;
+    font-size: 0.65rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--color-accent-neon);
+    vertical-align: middle;
+}
 
 .tagline {
     font-size: 1.1rem;
