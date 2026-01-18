@@ -129,11 +129,19 @@
         (() => {
             const canvas = document.getElementById('mountain-canvas');
             const renderer = new THREE.WebGLRenderer({ canvas, antialias: true });
-            renderer.setPixelRatio(window.devicePixelRatio);
+            const defaultPixelRatio = Math.min(1.25, window.devicePixelRatio);
+            renderer.setPixelRatio(defaultPixelRatio);
             renderer.setSize(window.innerWidth, window.innerHeight);
             renderer.setClearColor(0x060b14, 1);
             renderer.xr.enabled = true;
             renderer.xr.setReferenceSpaceType("local-floor");
+            renderer.xr.addEventListener("sessionstart", () => {
+                renderer.setPixelRatio(1);
+            });
+            renderer.xr.addEventListener("sessionend", () => {
+                renderer.setPixelRatio(defaultPixelRatio);
+                clearBolts3d();
+            });
 
             const scene = new THREE.Scene();
             scene.fog = new THREE.Fog(0x060b14, 22, 170);
@@ -157,12 +165,12 @@
             const terrainGroup = new THREE.Group();
             scene.add(terrainGroup);
 
-            const tileCount = 4;
+            const tileCount = 3;
             const tileLength = 120;
             const width = 220;
             const depth = 120;
-            const segmentsX = 120;
-            const segmentsZ = 80;
+            const segmentsX = 80;
+            const segmentsZ = 56;
 
             const baseGeometry = new THREE.PlaneGeometry(width, depth, segmentsX, segmentsZ);
             baseGeometry.rotateX(-Math.PI / 2);
@@ -267,6 +275,7 @@
             const noiseSeed = Math.random() * 1000;
             const noiseScale = 0.1;
             const noiseAmp = 2.4;
+            let normalFrame = 0;
 
             const stormCanvas = document.getElementById('storm-canvas');
             const stormCtx = stormCanvas.getContext('2d');
@@ -443,6 +452,16 @@
                 }
             }
 
+            function clearBolts3d() {
+                for (let i = lightningBolts3d.length - 1; i >= 0; i--) {
+                    const bolt = lightningBolts3d[i];
+                    lightningGroup.remove(bolt.line);
+                    bolt.line.geometry.dispose();
+                    bolt.line.material.dispose();
+                }
+                lightningBolts3d.length = 0;
+            }
+
             function createNoiseBuffer(ctx, seconds) {
                 const buffer = ctx.createBuffer(1, ctx.sampleRate * seconds, ctx.sampleRate);
                 const data = buffer.getChannelData(0);
@@ -582,12 +601,13 @@
                 offset = (offset + dt * speed) % travelLength;
                 const time = clock.elapsedTime;
 
+                const updateNormals = normalFrame++ % 2 === 0;
                 tiles.forEach((tile, idx) => {
                     let zPos = -idx * tileLength + offset;
                     if (zPos > tileLength) zPos -= travelLength;
                     tile.mesh.position.z = zPos;
                     tile.wire.position.z = zPos;
-                    updateTile(tile.mesh.geometry, time, zPos, true);
+                    updateTile(tile.mesh.geometry, time, zPos, updateNormals);
                     updateTile(tile.wire.geometry, time, zPos, false);
                 });
 
@@ -649,17 +669,22 @@
                     const flash = lightningFlash;
                     ambient.intensity = baseAmbient + flash * 0.8;
                     keyLight.intensity = baseKey + flash * 2.2;
-                    stormCtx.fillStyle = `rgba(255,255,255,${0.15 * flash})`;
-                    stormCtx.fillRect(0, 0, window.innerWidth, window.innerHeight);
+                    if (!renderer.xr.isPresenting) {
+                        stormCtx.fillStyle = `rgba(255,255,255,${0.15 * flash})`;
+                        stormCtx.fillRect(0, 0, window.innerWidth, window.innerHeight);
+                    }
                 } else {
                     ambient.intensity = baseAmbient;
                     keyLight.intensity = baseKey;
                 }
 
                 renderer.render(scene, camera);
-                drawRain(dt);
-                updateBolts(dt);
-                updateBolts3d(dt);
+                if (renderer.xr.isPresenting) {
+                    updateBolts3d(dt);
+                } else {
+                    drawRain(dt);
+                    updateBolts(dt);
+                }
             }
             renderer.setAnimationLoop(animate);
 

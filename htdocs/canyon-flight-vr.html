@@ -75,11 +75,18 @@
         (() => {
             const canvas = document.getElementById('canyon-canvas');
             const renderer = new THREE.WebGLRenderer({ canvas, antialias: true });
-            renderer.setPixelRatio(window.devicePixelRatio);
+            const defaultPixelRatio = Math.min(1.25, window.devicePixelRatio);
+            renderer.setPixelRatio(defaultPixelRatio);
             renderer.setSize(window.innerWidth, window.innerHeight);
             renderer.setClearColor(0x8fc9ff, 1);
             renderer.xr.enabled = true;
             renderer.xr.setReferenceSpaceType("local-floor");
+            renderer.xr.addEventListener("sessionstart", () => {
+                renderer.setPixelRatio(1);
+            });
+            renderer.xr.addEventListener("sessionend", () => {
+                renderer.setPixelRatio(defaultPixelRatio);
+            });
 
             const scene = new THREE.Scene();
             scene.fog = new THREE.Fog(0x8fc9ff, 30, 180);
@@ -106,12 +113,12 @@
             const treeGroup = new THREE.Group();
             scene.add(treeGroup);
 
-            const tileCount = 4;
+            const tileCount = 3;
             const tileLength = 120;
             const width = 120;
             const depth = 120;
-            const segmentsX = 120;
-            const segmentsZ = 80;
+            const segmentsX = 80;
+            const segmentsZ = 56;
 
             const baseGeometry = new THREE.PlaneGeometry(width, depth, segmentsX, segmentsZ);
             baseGeometry.rotateX(-Math.PI / 2);
@@ -267,9 +274,10 @@
             const noiseSeed = Math.random() * 1000;
             const noiseScale = 0.08;
             const noiseAmp = 8.4;
+            let normalFrame = 0;
 
-            const treeCount = 420;
-            const treeGeometry = new THREE.ConeGeometry(0.7, 4.2, 6);
+            const treeCount = 260;
+            const treeGeometry = new THREE.ConeGeometry(0.7, 4.2, 5);
             const treeMaterial = new THREE.MeshStandardMaterial({
                 color: 0x1c2f1a,
                 roughness: 0.95,
@@ -304,7 +312,7 @@
                     geometry.computeVertexNormals();
                 }
                 const colors = geometry.attributes.color;
-                if (colors && geometry.attributes.normal) {
+                if (colors && geometry.attributes.normal && updateNormals) {
                     const normal = geometry.attributes.normal;
                     for (let i = 0; i < pos.count; i++) {
                         const y = pos.getY(i);
@@ -341,12 +349,13 @@
                 offset = (offset + dt * speed) % travelLength;
                 const time = clock.elapsedTime;
 
+                const updateNormals = normalFrame++ % 2 === 0;
                 tiles.forEach((tile, idx) => {
                     let zPos = -idx * tileLength + offset;
                     if (zPos > tileLength) zPos -= travelLength;
                     tile.mesh.position.z = zPos;
                     tile.wire.position.z = zPos;
-                    updateTile(tile.mesh.geometry, travel, zPos, true);
+                    updateTile(tile.mesh.geometry, travel, zPos, updateNormals);
                     updateTile(tile.wire.geometry, travel, zPos, false);
                 });
                 const treeTravel = travel % travelLength;
