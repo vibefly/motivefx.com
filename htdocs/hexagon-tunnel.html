@@ -106,7 +106,7 @@
         const hexHeight = Math.sqrt(3) * hexSize;
         const circumference = columns * hexWidth;
         const radius = circumference / (Math.PI * 2);
-        const depth = (rows + 0.5) * hexHeight;
+        const depth = rows * hexHeight;
         const speed = 3.8;
 
         const segmentCount = columns * rows * sides;
