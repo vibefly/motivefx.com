@@ -117,30 +117,39 @@
             const scene = new THREE.Scene();
             scene.fog = new THREE.FogExp2(0x000000, 0.0);
 
-            const camera = new THREE.PerspectiveCamera(70, window.innerWidth / window.innerHeight, 0.1, 80);
+            const camera = new THREE.PerspectiveCamera(70, window.innerWidth / window.innerHeight, 0.1, 700);
             camera.position.set(0, 0, 0);
 
             const starGeometry = new THREE.BufferGeometry();
-            const starCount = 1200;
+            const starCount = 2200;
             const starPositions = new Float32Array(starCount * 3);
+            const starColors = new Float32Array(starCount * 3);
+            const starColor = new THREE.Color(0x9ad9ff);
             for (let i = 0; i < starCount; i++) {
-                const radius = 50 + Math.random() * 80;
+                const radius = 140 + Math.random() * 140;
                 const theta = Math.random() * Math.PI * 2;
                 const phi = Math.acos(2 * Math.random() - 1);
                 const idx = i * 3;
                 starPositions[idx] = Math.sin(phi) * Math.cos(theta) * radius;
                 starPositions[idx + 1] = Math.sin(phi) * Math.sin(theta) * radius;
-                starPositions[idx + 2] = Math.cos(phi) * radius;
+                starPositions[idx + 2] = -200 - Math.random() * 400;
+                starColors[idx] = starColor.r;
+                starColors[idx + 1] = starColor.g;
+                starColors[idx + 2] = starColor.b;
             }
             starGeometry.setAttribute("position", new THREE.BufferAttribute(starPositions, 3));
+            starGeometry.setAttribute("color", new THREE.BufferAttribute(starColors, 3));
             const starMaterial = new THREE.PointsMaterial({
                 color: 0x9ad9ff,
-                size: 0.4,
+                size: 0.55,
                 transparent: true,
-                opacity: 0.65,
-                depthWrite: false
+                opacity: 1,
+                vertexColors: true,
+                depthWrite: false,
+                blending: THREE.AdditiveBlending
             });
             const stars = new THREE.Points(starGeometry, starMaterial);
+            stars.renderOrder = 1;
             scene.add(stars);
 
             const sides = 6;
@@ -181,6 +190,15 @@
             }
 
             const cloudTexture = makeCloudTexture();
+            const cloudPalette = [
+                new THREE.Color(0xff7ad9),
+                new THREE.Color(0x7dffb2),
+                new THREE.Color(0x9e7bff),
+                new THREE.Color(0x6fe1ff),
+                new THREE.Color(0xff6b4a),
+                new THREE.Color(0xffa94d),
+                new THREE.Color(0xffe066)
+            ];
             const cloudMaterial = new THREE.PointsMaterial({
                 map: cloudTexture,
                 size: 12,
@@ -204,13 +222,22 @@
                     positions[i * 3 + 2] = -(Math.random() * depth + depth * 0.6);
                 }
                 const colors = new Float32Array(cloudsPerLayer * 3);
+                const baseColors = new Float32Array(cloudsPerLayer * 3);
                 geom.setAttribute("position", new THREE.BufferAttribute(positions, 3));
                 geom.setAttribute("color", new THREE.BufferAttribute(colors, 3));
                 const points = new THREE.Points(geom, cloudMaterial.clone());
                 points.material.size *= 0.9 + layer * 0.2;
                 points.material.opacity = 0;
+                points.renderOrder = 0;
                 scene.add(points);
-                cloudLayers.push({ points, positions, colors, speed: 1.2 + layer * 0.6 });
+                for (let i = 0; i < cloudsPerLayer; i++) {
+                    const tint = cloudPalette[Math.floor(Math.random() * cloudPalette.length)];
+                    const idx = i * 3;
+                    baseColors[idx] = tint.r;
+                    baseColors[idx + 1] = tint.g;
+                    baseColors[idx + 2] = tint.b;
+                }
+                cloudLayers.push({ points, positions, colors, baseColors, speed: 0.15 + layer * 0.08 });
             }
             let cloudOpacity = 0;
 
@@ -353,6 +380,7 @@
             let lastBeatIndex = -1;
             const normal = new THREE.Vector3();
             const up = new THREE.Vector3(0, 0, 1);
+            const starDrift = starPositions.slice();
             const cloudColor = new THREE.Color(0x9fdcff);
 
             function smoothstep(edge0, edge1, x) {
@@ -383,6 +411,24 @@
                 }
                 tunnel.geometry.attributes.position.needsUpdate = true;
 
+                for (let i = 0; i < starPositions.length; i += 3) {
+                    starPositions[i + 2] += speed * dt * 0.2;
+                    if (starPositions[i + 2] > -40) {
+                        starPositions[i] = (Math.random() - 0.5) * 200;
+                        starPositions[i + 1] = (Math.random() - 0.5) * 200;
+                        starPositions[i + 2] = -200 - Math.random() * 400;
+                    }
+                    const z = starPositions[i + 2];
+                    const fadeIn = smoothstep(-600, -200, z);
+                    const fadeOut = 1 - smoothstep(-80, -40, z);
+                    const alpha = Math.min(1, fadeIn * fadeOut * 2.0);
+                    starColors[i] = starColor.r * alpha;
+                    starColors[i + 1] = starColor.g * alpha;
+                    starColors[i + 2] = starColor.b * alpha;
+                }
+                stars.geometry.attributes.position.needsUpdate = true;
+                stars.geometry.attributes.color.needsUpdate = true;
+
                 cloudOpacity = Math.min(0.35, cloudOpacity + dt * 0.08);
                 for (let i = 0; i < cloudLayers.length; i++) {
                     const layer = cloudLayers[i];
@@ -397,9 +443,9 @@
                         const fadeOut = 1 - smoothstep(-depth * 0.4, -depth * 0.2, z);
                         const alpha = fadeIn * fadeOut * 0.2;
                         const colorIndex = j;
-                        layer.colors[colorIndex] = cloudColor.r * alpha;
-                        layer.colors[colorIndex + 1] = cloudColor.g * alpha;
-                        layer.colors[colorIndex + 2] = cloudColor.b * alpha;
+                        layer.colors[colorIndex] = layer.baseColors[colorIndex] * alpha;
+                        layer.colors[colorIndex + 1] = layer.baseColors[colorIndex + 1] * alpha;
+                        layer.colors[colorIndex + 2] = layer.baseColors[colorIndex + 2] * alpha;
                     }
                     layer.points.geometry.attributes.position.needsUpdate = true;
                     layer.points.geometry.attributes.color.needsUpdate = true;
