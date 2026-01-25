@@ -155,7 +155,7 @@
             const speed = 3.4;
             const bpm = 120;
             const beatInterval = 60 / bpm;
-            const maxExtrude = hexSize * 0.1;
+            const maxExtrude = hexSize * 0.4;
 
             function makeCloudTexture() {
                 const size = 128;
@@ -253,9 +253,6 @@
                 new THREE.Color(0xaf52de)
             ];
             const pulseIndices = [];
-            for (let i = 1; i < 5; i++) {
-                pulseIndices.push(0, i, i + 1);
-            }
             for (let i = 1; i < 5; i++) {
                 pulseIndices.push(6, 6 + i + 1, 6 + i);
             }
