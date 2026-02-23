@@ -21,7 +21,7 @@
                 pointColor: '#f5ff1a',
                 pointSize: 1.3,
                 cameraZ: 110,
-                particleCount: 400,
+                particleCount: 200,
             };
             this.config = Object.assign({}, defaults, options);
             this.container = typeof this.config.container === 'string'
@@ -388,8 +388,8 @@
             this._handleMouseMove = (event) => {
                 const width = window.innerWidth || this.container.clientWidth || 1;
                 const height = window.innerHeight || this.container.clientHeight || 1;
-                this.mouseRotation.targetX = mapRange(event.clientX, width, 0.35);
-                this.mouseRotation.targetY = mapRange(event.clientY, height, 0.25);
+                this.mouseRotation.targetX = mapRange(event.clientX, width, 0.15);
+                this.mouseRotation.targetY = mapRange(event.clientY, height, 0.10);
             };
             this._handleMouseLeave = () => {
                 this.mouseRotation.targetX = 0;
@@ -418,10 +418,10 @@
                 this.geometry.attributes.position.needsUpdate = true;
             }
 
-            this.autoRotation.y += delta * 0.08;
-            this.autoRotation.x += delta * 0.02;
-            this.mouseRotation.currentX += (this.mouseRotation.targetX - this.mouseRotation.currentX) * 0.06;
-            this.mouseRotation.currentY += (this.mouseRotation.targetY - this.mouseRotation.currentY) * 0.06;
+            this.autoRotation.y += delta * 0.03;
+            this.autoRotation.x += delta * 0.008;
+            this.mouseRotation.currentX += (this.mouseRotation.targetX - this.mouseRotation.currentX) * 0.03;
+            this.mouseRotation.currentY += (this.mouseRotation.targetY - this.mouseRotation.currentY) * 0.03;
 
             if (this.points) {
                 this.points.rotation.y = this.autoRotation.y + this.mouseRotation.currentX;
