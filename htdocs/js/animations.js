@@ -155,7 +155,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     const target = document.getElementById(navTargetId);
                     if (target) {
                         const rect = target.getBoundingClientRect();
-                        const markerY = viewportHeight * 0.45;
+                        const markerY = window.innerHeight * 0.45;
                         if (rect.top <= markerY && rect.bottom >= markerY) {
                             isNavScroll = false;
                             navTargetId = null;
