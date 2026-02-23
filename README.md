@@ -1,3 +1,1 @@
-# emacmedia.com
-
-Experimental site for design + technology studies.
+# motivefx.com

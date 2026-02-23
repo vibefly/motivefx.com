@@ -3,195 +3,277 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>emacmedia | Design + Technology Experiments</title>
+    <title>motiveFx | Creative Marketing. Built to Perform.</title>
     <link rel="stylesheet" href="styles.css">
     <link rel="icon" type="image/png" href="images/favicon.png">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@400;600;800&family=Work+Sans:wght@300;400;600&display=swap" rel="stylesheet">
+    <style>
+    </style>
 </head>
-<body class="theme-summit">
-    <div class="backdrop">
-        <div class="backdrop__sun"></div>
-        <div class="backdrop__glow"></div>
-        <div class="backdrop__stars"></div>
-        <div class="backdrop__bird" aria-hidden="true"></div>
-        <div class="backdrop__bird backdrop__bird--alt" aria-hidden="true"></div>
-        <div class="backdrop__mountain"></div>
-        <div class="backdrop__peak"></div>
-        <div class="backdrop__ridge"></div>
+<body class="no-js">
+    <div id="hero-animation-canvas" class="eye-candy-bg"></div>
+    <div id="wrapper">
+        
+        <header id="main-header">
+            <a href="index.html" class="logo">motiveFx</a>
+            <button class="nav-toggle" aria-expanded="false" aria-controls="main-nav">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="nav-toggle-bar"></span>
+                <span class="nav-toggle-bar"></span>
+                <span class="nav-toggle-bar"></span>
+            </button>
+            <nav id="main-nav">
+                <ul>
+                    <li><a href="#about">About</a></li>
+                    <li><a href="#services">Services</a></li>
+                    <li><a href="#studies">Studies</a></li>
+                    <li><a href="#contact">Contact</a></li>
+                </ul>
+            </nav>
+        </header>
+
+        <section id="hero" class="full-screen dark-bg" data-morph-shape="scatter">
+
+            <div class="hero-content">
+                <p class="tagline">Creative Marketing. Built to Perform.</p>
+                <h1>From imagination to digital reality.</h1>
+                <p class="subtext">One-of-a-kind designs and digital solutions that deliver high impact results.</p>
+                <a href="#contact" class="cta-button primary-shiny-btn cta-button--wide">Start Your Project</a>
+            </div>
+        </section>
+
+<section id="about" class="section-padding section-fullscreen" data-morph-shape="wave">
+    <h2 class="section-headline">A Studio of One</h2>
+    <p class="section-subtext">
+        MotiveFx is a solo creative studio combining art and technical expertise to deliver engaging, results-driven content.
+    </p>
+
+    <!-- Centering container -->
+    <div class="team-container">
+        <div class="team-member pillar">
+            <img src="images/headshot.jpg" alt="Eric McWeeney" class="headshot">
+            <h4>Eric McWeeney</h4>
+            <p class="role">Artist & Director</p>
+            <p class="bio-snippet">
+                Eric has over 20 years of experience in software engineering and art direction. He builds finely crafted experiences from concept to launch.
+            </p>
+        </div>
     </div>
+</section>
 
-    <header id="main-header">
-        <a href="index.html" class="logo">emacmedia</a>
-        <nav id="main-nav">
-            <ul>
-                <li><a href="index.html#hero">Home</a></li>
-                <li><a href="index.html#experiments">Experiments</a></li>
-                <li><a href="index.html#notes">Notes</a></li>
-                <li><a href="index.html#contact">Contact</a></li>
-            </ul>
-        </nav>
-    </header>
 
-    <main>
-        <section id="hero" class="section hero">
-            <div class="hero__content">
-                <p class="eyebrow reveal" style="animation-delay: 0.1s;">A less-formal studio for design + tech play</p>
-                <h1 class="reveal" style="animation-delay: 0.2s;">Campfire experiments under a wide digital sky.</h1>
-                <p class="lead reveal" style="animation-delay: 0.3s;">
-                    emacmedia is a playground for motion, 3D, and interactive studies. Curious, lightweight,
-                    and always in-progress.
-                </p>
-                <div class="hero__actions reveal" style="animation-delay: 0.4s;">
-                    <a class="btn btn--primary" href="#experiments">Explore the field</a>
-                    <a class="btn btn--ghost" href="#contact">Say hello</a>
+        <section id="services" class="section-padding dark-bg" data-morph-shape="sphere">
+            <h2 class="section-headline">Our Services</h2>
+            <p class="section-subtext">Delivering high-impact results with creative ideas and technical expertise.</p>
+
+            <div class="pillars-container">
+
+                <div class="pillar">
+                    <h3>Software Engineering</h3>
+                    <p>Custom integrations and digital workflows engineered to improve business efficiency, and scale on demand.</p>
                 </div>
-            </div>
-            <div class="hero__card reveal" style="animation-delay: 0.5s;">
-                <div class="card__label">Field Log</div>
-                <h2>Current Focus</h2>
-                <p>Generative motion, WebGL sketches, and micro-interactions that feel tactile.</p>
-                <div class="card__meta">
-                    <span>Last updated: whenever the fire sparks</span>
+
+                <div class="pillar">
+                    <h3>Web Development</h3>
+                    <p>Modern, engaging websites built to support marketing objectives and enhance user experience.</p>
                 </div>
+
+                <div class="pillar">
+                    <h3>Graphic Design</h3>
+                    <p>Brand visuals, marketing materials, and digital assets crafted with clarity, precision, and purpose.</p>
+                </div>
+
+                <div class="pillar">
+                    <h3>Photography</h3>
+                    <p>Studio and location photography that captures products, spaces, and stories with detail and intention.</p>
+                </div>
+
+                <div class="pillar">
+                    <h3>Video Production</h3>
+                    <p>Planning, shooting, and producing video content designed to elevate brand messaging and engagement.</p>
+                </div>
+
+                <div class="pillar">
+                    <h3>Post Production</h3>
+                    <p>Editing, color grading, animation, and motion graphics that bring visual projects to their final polished form.</p>
+                </div>
+
             </div>
         </section>
 
-        <section id="experiments" class="section section--flush">
-            <div class="section__header">
-                <h2>Experiments & Studies</h2>
-                <p>Grab a seat. These are live sketches from the lab, ranging from VR tunnels to shader tests.</p>
-            </div>
-            <div class="grid experiments-grid">
-                <a class="card" href="radial-aurora-vr.html">
-                    <h3>Radial Aurora</h3>
-                    <p>Immersive aurora pulses in a radial VR tunnel.</p>
-                </a>
-                <a class="card" href="fireworks.html">
-                    <h3>Audio Fireworks</h3>
-                    <p>Live audio drives reactive bursts and ambient HUD.</p>
-                </a>
-                <a class="card" href="tunnel-wireframe-vr.html">
-                    <h3>Wireframe Tunnel</h3>
-                    <p>Neon flight through a curved wireframe corridor.</p>
-                </a>
-                <a class="card" href="tunnel-dots-vr.html">
-                    <h3>Dotted Tunnel</h3>
-                    <p>Pulsing dots and twisting travel lines in VR.</p>
-                </a>
-                <a class="card" href="hexagon-tunnel-wireframe-vr.html">
-                    <h3>Hexagon Wireframe</h3>
-                    <p>Classic honeycomb tunnel with spatial depth.</p>
-                </a>
-                <a class="card" href="hexagon-color-tunnel-vr.html">
-                    <h3>Hexagon Color</h3>
-                    <p>Color pulses ride the hex tunnel in time.</p>
-                </a>
-                <a class="card" href="ocean-squall-vr.html">
-                    <h3>Ocean Squall</h3>
-                    <p>Stormy seas, rain, and lightning in VR.</p>
-                </a>
-                <a class="card" href="mountain-run-vr.html">
-                    <h3>Mountain Run</h3>
-                    <p>Neon ridge run with drifting haze.</p>
-                </a>
-                <a class="card" href="canyon-flight-vr.html">
-                    <h3>Canyon Flight</h3>
-                    <p>Sweeping canyon corridors with edge light.</p>
-                </a>
-                <a class="card" href="rain.html">
-                    <h3>Rain Shader</h3>
-                    <p>Layered rain with splashes and wind shear.</p>
-                </a>
-                <a class="card" href="neon-plazma.html">
-                    <h3>Neon Plazma</h3>
-                    <p>Drifting neon haze with parallax depth.</p>
-                </a>
-                <a class="card" href="icosahedron-wireframe.html">
-                    <h3>Icosahedron</h3>
-                    <p>Minimalist wireframe spin with a neon core.</p>
-                </a>
-                <a class="card" href="chroma-grid-wipe.html">
-                    <h3>Chroma Grid</h3>
-                    <p>Vibrant tile wipes in synchronized palette.</p>
-                </a>
-                <a class="card" href="refracting-dice.html">
-                    <h3>Refracting Dice</h3>
-                    <p>Beveled glass dice over shifting grid.</p>
-                </a>
-                <a class="card" href="lumen-garden.html">
-                    <h3>Lumen Garden</h3>
-                    <p>Soft light studies with layered atmospheres.</p>
-                </a>
-                <a class="card" href="portal-tunnel.html">
-                    <h3>Portal Tunnel</h3>
-                    <p>Rings of light moving through a portal funnel.</p>
-                </a>
-                <a class="card" href="radial-bulge.html">
-                    <h3>Radial Bulge</h3>
-                    <p>Breathing distortion and light pulses.</p>
-                </a>
-                <a class="card" href="radial-bulge-aurora.html">
-                    <h3>Bulge Aurora</h3>
-                    <p>Mixed aurora glow and warped surfaces.</p>
-                </a>
-                <a class="card" href="hexagon-tunnel-vr.html">
-                    <h3>Hexagon Tunnel</h3>
-                    <p>Classic VR tunnel with depth and cadence.</p>
-                </a>
-                <a class="card" href="vanta-background.html">
-                    <h3>Vanta Field</h3>
-                    <p>Ambient field test with drifting particles.</p>
-                </a>
+        <section id="studies" class="section-padding dark-bg" data-morph-shape="cube">
+            <h2 class="section-headline">Studies</h2>
+            <p class="section-subtext">Explore our design experiments utilizing WebGL, Three.js, and more.</br>
+                <i>Please be sure to view on a device with gpu capability.</i></p>
+            <div id="studies-grid" class="pillars-container">
+                <div class="pillar">
+                    <div class="study-body">
+                        <h3>Radial Aurora <span class="vr-badge">VR</span></h3>
+                        <p>Step into the aurora field in immersive VR as the light pulses around you.</p>
+                        <a class="cta-button primary-shiny-btn study-link" href="radial-aurora-vr.html">Open Study</a>
+                    </div>
+                </div>
+
+                <div class="pillar">
+                    <div class="study-body">
+                        <h3>Audio Reactive Fireworks</h3>
+                        <p>Fireworks that react to your active audio input—mic or interface—triggering bursts on peaks with live sensitivity controls and HUD feedback.</p>
+                        <a class="cta-button primary-shiny-btn study-link" href="fireworks.html">Open Study</a>
+                    </div>
+                </div>
+
+                <div class="pillar">
+                    <div class="study-body">
+                        <h3>Curved Wireframe Tunnel <span class="vr-badge">VR</span></h3>
+                        <p>Fly through the neon wireframe tunnel in immersive VR.</p>
+                        <a class="cta-button primary-shiny-btn study-link" href="tunnel-wireframe-vr.html">Open Study</a>
+                    </div>
+                </div>
+
+                <div class="pillar">
+                    <div class="study-body">
+                        <h3>Curved Dotted Tunnel <span class="vr-badge">VR</span></h3>
+                        <p>Ride the dotted tunnel in immersive VR as the dots pulse and twist.</p>
+                        <a class="cta-button primary-shiny-btn study-link" href="tunnel-dots-vr.html">Open Study</a>
+                    </div>
+                </div>
+
+                <div class="pillar">
+                    <div class="study-body">
+                        <h3>Hexagon Tunnel Wireframe <span class="vr-badge">VR</span></h3>
+                        <p>Classic wireframe honeycomb tunnel in immersive VR.</p>
+                        <a class="cta-button primary-shiny-btn study-link" href="hexagon-tunnel-wireframe-vr.html">Open Study</a>
+                    </div>
+                </div>
+
+                <div class="pillar">
+                    <div class="study-body">
+                        <h3>Hexagon Color Tunnel <span class="vr-badge">VR</span></h3>
+                        <p>Color pulses ride the hex tunnel in time.</p>
+                        <a class="cta-button primary-shiny-btn study-link" href="hexagon-color-tunnel-vr.html">Open Study</a>
+                    </div>
+                </div>
+
+                <div class="pillar">
+                    <div class="study-body">
+                        <h3>Ocean Squall <span class="vr-badge">VR</span></h3>
+                        <p>Enter the storm in immersive VR with rolling swells, rain, and lightning.</p>
+                        <a class="cta-button primary-shiny-btn study-link" href="ocean-squall-vr.html">Open Study</a>
+                    </div>
+                </div>
+
+                <div class="pillar">
+                    <div class="study-body">
+                        <h3>Mountain Run <span class="vr-badge">VR</span></h3>
+                        <p>Step into the ridge run in immersive VR with neon edge light and drifting haze.</p>
+                        <a class="cta-button primary-shiny-btn study-link" href="mountain-run-vr.html">Open Study</a>
+                    </div>
+                </div>
+
+                <div class="pillar">
+                    <div class="study-body">
+                        <h3>Canyon Flight <span class="vr-badge">VR</span></h3>
+                        <p>Fly the canyon corridor in immersive VR with sweeping cliff walls.</p>
+                        <a class="cta-button primary-shiny-btn study-link" href="canyon-flight-vr.html">Open Study</a>
+                    </div>
+                </div>
+
+                <div class="pillar">
+                    <div class="study-body">
+                        <h3>Rain Shader</h3>
+                        <p>Layered rain shader with splashes, wind shear, streaked camera motion, and reflective ground ripples.</p>
+                        <a class="cta-button primary-shiny-btn study-link" href="rain.html">Open Study</a>
+                    </div>
+                </div>
+
+                <div class="pillar">
+                    <div class="study-body">
+                        <h3>Neon Plazma</h3>
+                        <p>Drifting, layered neon plazma with subtle parallax and depth haze.</p>
+                        <a class="cta-button primary-shiny-btn study-link" href="neon-plazma.html">Open Study</a>
+                    </div>
+                </div>
+
+                <div class="pillar">
+                    <div class="study-body">
+                        <h3>Icosahedron Wireframe</h3>
+                        <p>Minimalist study of a spinning wireframe icosahedron with crisp edges and a neon core.</p>
+                        <a class="cta-button primary-shiny-btn study-link" href="icosahedron-wireframe.html">Open Study</a>
+                    </div>
+                </div>
+
+                <div class="pillar">
+                    <div class="study-body">
+                        <h3>Chroma Grid Wipe</h3>
+                        <p>Vibrant tiles pulse in a shared palette while each cell wipes to a new color.</p>
+                        <a class="cta-button primary-shiny-btn study-link" href="chroma-grid-wipe.html">Open Study</a>
+                    </div>
+                </div>
+
+                <div class="pillar">
+                    <div class="study-body">
+                        <h3>Refracting Dice</h3>
+                        <p>A candy-red dice refracts the shifting grid with beveled pips.</p>
+                        <a class="cta-button primary-shiny-btn study-link" href="refracting-dice.html">Open Study</a>
+                    </div>
+                </div>
+
             </div>
         </section>
 
-        <section id="notes" class="section">
-            <div class="section__header">
-                <h2>Camp Notes</h2>
-                <p>Quick notes, half-baked ideas, and experiments in progress.</p>
-            </div>
-            <div class="grid notes-grid">
-                <div class="note">
-                    <h3>Toolbox</h3>
-                    <p>Three.js, GLSL, GSAP, Web Audio, and a lot of late-night tweaking.</p>
+        <section id="contact" class="section-padding" data-morph-shape="spiralshell">
+            <h2 class="section-headline">Contact Us</h2>
+            <p class="section-subtext">Tell us about your company's needs. We’ll follow up within one business day.</p>
+            <form class="contact-form"
+                action="https://formspree.io/f/mldqvzwg"
+                method="POST">
+                <div class="form-row">
+                    <label for="contact-first-name">First Name</label>
+                    <input type="text" id="contact-first-name" name="first_name" placeholder="First name" required pattern="^[A-Za-z][A-Za-z\\s'-]{1,}$" title="Enter a valid first name.">
                 </div>
-                <div class="note">
-                    <h3>Principles</h3>
-                    <p>Keep it tactile. Keep it playful. If it feels alive, it ships.</p>
+                <div class="form-row">
+                    <label for="contact-last-name">Last Name</label>
+                    <input type="text" id="contact-last-name" name="last_name" placeholder="Last name" required pattern="^[A-Za-z][A-Za-z\\s'-]{1,}$" title="Enter a valid last name.">
                 </div>
-                <div class="note">
-                    <h3>Open to Collabs</h3>
-                    <p>Always down to trade sparks with other builders and artists.</p>
+                <div class="form-row">
+                    <label for="contact-company">Company</label>
+                    <input type="text" id="contact-company" name="company" placeholder="Your organization">
                 </div>
-            </div>
-        </section>
-
-        <section id="contact" class="section">
-            <div class="section__header">
-                <h2>Contact</h2>
-                <p>Want to trade ideas or share a project? Send a note.</p>
-            </div>
-            <form class="contact-card contact-form" action="https://formspree.io/f/mlglarlk" method="POST">
-                <input type="text" name="_gotcha" tabindex="-1" autocomplete="off" aria-hidden="true" class="honeypot">
-
-                <label for="contact-name">Name</label>
-                <input id="contact-name" name="name" type="text" placeholder="Your name" required>
-
-                <label for="contact-email">Email</label>
-                <input id="contact-email" name="email" type="email" placeholder="you@example.com" required>
-
-                <label for="contact-message">Message</label>
-                <textarea id="contact-message" name="message" rows="5" placeholder="What’s on your mind?" required></textarea>
-
-                <button type="submit" class="btn btn--primary">Send</button>
+                <div class="form-row">
+                    <label for="contact-phone">Phone</label>
+                    <input type="tel" id="contact-phone" name="phone" placeholder="(555) 123-4567" pattern="^\\+?[0-9\\s().-]{7,}$" title="Enter a valid phone number using digits with optional +, (), spaces, or dashes.">
+                </div>
+                <div class="form-row">
+                    <label for="contact-email">Email</label>
+                    <input type="email" id="contact-email" name="email" placeholder="you@example.com" required>
+                </div>
+                <div class="form-row">
+                    <label for="contact-message">Message</label>
+                    <textarea id="contact-message" name="message" rows="5" placeholder="What can we do for you?" required pattern="^(?:(?!<|>|script|javascript:).)+$"></textarea>
+                </div>
+                <input type="text" name="_gotcha" tabindex="-1" autocomplete="off" aria-hidden="true" style="position:absolute; left:-5000px; opacity:0;">
+                <button type="submit" class="cta-button primary-shiny-btn cta-button--wide">Inquire</button>
             </form>
         </section>
-    </main>
 
-    <footer class="site-footer">
-        <p>&copy; 2026 emacmedia. All experiments welcome.</p>
-    </footer>
+        <footer id="main-footer">
+            <p>&copy; 2026 motiveFx. All Rights Reserved. |
+                <a href="privacy-policy.html">Privacy Policy</a> |
+                <a href="terms-of-service.html">Terms of Service</a>
+            </p>
+        </footer>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollToPlugin.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+
+    <script src="js/three.min.r134.js"></script>
+    <script src="js/morphing-dots.js" defer></script>
+    <script src="js/animations.js" defer></script>
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+            document.body.classList.remove("no-js");
+        });
+    </script>
 </body>
 </html>
