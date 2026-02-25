@@ -179,6 +179,9 @@
                 const btn = form.querySelector('button[type="submit"]');
                 btn.disabled = true;
 
+                /* Lock section height so nothing shifts during transitions */
+                contactSection.style.minHeight = contactSection.offsetHeight + 'px';
+
                 /* -- Phase 1: Fade out form -- */
                 gsap.to(form, {
                     opacity: 0, y: 20, duration: 0.45, ease: 'power2.in',
