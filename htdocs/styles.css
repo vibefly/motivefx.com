@@ -603,6 +603,53 @@ body.static-page section {
         letter-spacing: 0.05em;
     }
 }
+/* --- Contact Sending State --- */
+.contact-sending {
+    max-width: 700px;
+    margin: 0 auto;
+    text-align: center;
+    padding: 4rem 1rem;
+}
+.sending-status {
+    font-size: 1.15rem;
+    color: var(--color-text-secondary);
+    margin-bottom: 2.5rem;
+    min-height: 1.6em;
+    letter-spacing: 0.03em;
+}
+.sending-progress-track {
+    width: 100%;
+    height: 3px;
+    background: rgba(255, 255, 255, 0.06);
+    border-radius: 2px;
+    overflow: hidden;
+}
+.sending-progress-bar {
+    width: 0;
+    height: 100%;
+    background: linear-gradient(90deg, var(--color-accent-blue), var(--color-accent-neon));
+    border-radius: 2px;
+    box-shadow: 0 0 14px rgba(245, 255, 26, 0.25);
+}
+
+/* --- Contact Thank You State --- */
+.form-thank-you {
+    text-align: center;
+    max-width: 700px;
+    margin: 0 auto;
+    padding: 3rem 1rem;
+}
+.form-thank-you p {
+    font-size: 1.2rem;
+    color: var(--color-text-secondary);
+    margin-bottom: 0.75rem;
+    line-height: 1.7;
+}
+.form-thank-you .thank-you-subtext {
+    font-size: 0.95rem;
+    color: rgba(170, 170, 170, 0.6);
+    margin-top: 1rem;
+}
 .form-row input,
 .form-row textarea {
     background: var(--color-light-bg);

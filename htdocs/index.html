@@ -104,7 +104,7 @@
         <section id="contact" class="section-padding" data-morph-shape="spiralshell">
             <h2 class="section-headline">Get in Touch</h2>
             <p class="section-subtext">Tell us about your project. We’ll respond within one business day.</p>
-            <form class="contact-form"
+            <form id="contact-form" class="contact-form"
                 action="https://formspree.io/f/mldqvzwg"
                 method="POST">
                 <div class="form-row">
@@ -154,6 +154,162 @@
     <script>
         document.addEventListener("DOMContentLoaded", () => {
             document.body.classList.remove("no-js");
+
+            const form = document.getElementById('contact-form');
+            const contactSection = document.getElementById('contact');
+            const headline = contactSection.querySelector('.section-headline');
+            const subtext = contactSection.querySelector('.section-subtext');
+            const formAction = form.action;
+
+            const statusMessages = [
+                'Waking up the carrier pigeons\u2026',
+                'Teaching your message to fly\u2026',
+                'Bribing the mail server with cookies\u2026',
+                'Encrypting with good vibes\u2026',
+                'Folding your message into a paper airplane\u2026',
+                'Convincing the internet you\u2019re not a robot\u2026',
+                'Pouring coffee for the server\u2026',
+                'Negotiating with the WiFi gods\u2026',
+                'Almost there, pinky promise\u2026'
+            ];
+
+            form.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const formData = new FormData(form);
+                const btn = form.querySelector('button[type="submit"]');
+                btn.disabled = true;
+
+                /* -- Phase 1: Fade out form -- */
+                gsap.to(form, {
+                    opacity: 0, y: 20, duration: 0.45, ease: 'power2.in',
+                    onComplete: () => {
+                        form.style.display = 'none';
+                        beginSending(formData);
+                    }
+                });
+                gsap.to(subtext, { opacity: 0, duration: 0.35 });
+            });
+
+            async function beginSending(formData) {
+                /* -- Phase 2: Show progress UI -- */
+                const sending = document.createElement('div');
+                sending.className = 'contact-sending';
+                sending.innerHTML =
+                    '<div class="sending-status"></div>' +
+                    '<div class="sending-progress-track">' +
+                        '<div class="sending-progress-bar"></div>' +
+                    '</div>';
+                contactSection.insertBefore(sending, form);
+
+                const statusEl = sending.querySelector('.sending-status');
+                const barEl = sending.querySelector('.sending-progress-bar');
+
+                gsap.fromTo(sending,
+                    { opacity: 0, y: -15 },
+                    { opacity: 1, y: 0, duration: 0.5, ease: 'power2.out' }
+                );
+
+                /* Cycle funny status messages */
+                let msgIdx = 0;
+                statusEl.textContent = statusMessages[msgIdx++];
+                gsap.fromTo(statusEl, { opacity: 0 }, { opacity: 1, duration: 0.3 });
+
+                let stopped = false;
+                const msgTimer = setInterval(() => {
+                    if (stopped) return;
+                    gsap.to(statusEl, {
+                        opacity: 0, y: -8, duration: 0.2,
+                        onComplete: () => {
+                            statusEl.textContent = statusMessages[msgIdx % statusMessages.length];
+                            msgIdx++;
+                            gsap.fromTo(statusEl,
+                                { opacity: 0, y: 8 },
+                                { opacity: 1, y: 0, duration: 0.2 }
+                            );
+                        }
+                    });
+                }, 1800);
+
+                /* Animate bar to ~75% while waiting */
+                gsap.to(barEl, { width: '75%', duration: 5, ease: 'power1.out' });
+
+                /* -- Fire the actual fetch -- */
+                let ok = false;
+                try {
+                    const res = await fetch(formAction, {
+                        method: 'POST',
+                        body: formData,
+                        headers: { 'Accept': 'application/json' }
+                    });
+                    ok = res.ok;
+                } catch { ok = false; }
+
+                stopped = true;
+                clearInterval(msgTimer);
+
+                if (ok) {
+                    /* -- Phase 3: Complete bar & show delivered -- */
+                    gsap.to(barEl, { width: '100%', duration: 0.5, ease: 'power2.out' });
+                    gsap.to(statusEl, {
+                        opacity: 0, duration: 0.15,
+                        onComplete: () => {
+                            statusEl.textContent = 'Message delivered!';
+                            gsap.to(statusEl, { opacity: 1, duration: 0.25 });
+                        }
+                    });
+
+                    await new Promise(r => setTimeout(r, 1400));
+
+                    /* -- Phase 4: Transition to Thank You -- */
+                    gsap.to(sending, {
+                        opacity: 0, y: -15, duration: 0.4, ease: 'power2.in',
+                        onComplete: () => {
+                            sending.remove();
+                            showThankYou();
+                        }
+                    });
+                } else {
+                    /* -- Error: bring form back -- */
+                    gsap.to(sending, {
+                        opacity: 0, duration: 0.3,
+                        onComplete: () => {
+                            sending.remove();
+                            form.style.display = '';
+                            const btn = form.querySelector('button[type="submit"]');
+                            btn.disabled = false;
+                            gsap.to(form, { opacity: 1, y: 0, duration: 0.4 });
+                            gsap.to(subtext, { opacity: 1, duration: 0.3 });
+                        }
+                    });
+                }
+            }
+
+            function showThankYou() {
+                /* Crossfade headline to "Thank You" */
+                gsap.to(headline, {
+                    opacity: 0, duration: 0.3,
+                    onComplete: () => {
+                        headline.textContent = 'Thank You';
+                        gsap.to(headline, { opacity: 1, duration: 0.5 });
+                    }
+                });
+
+                /* Build thank-you content */
+                const ty = document.createElement('div');
+                ty.className = 'form-thank-you';
+                ty.innerHTML =
+                    '<p>We received your message and look forward to speaking with you.</p>' +
+                    '<p class="thank-you-subtext">We\u2019ll respond within one business day.</p>';
+
+                subtext.style.display = 'none';
+                contactSection.insertBefore(ty, form);
+                form.remove();
+
+                gsap.fromTo(ty,
+                    { opacity: 0, y: 25 },
+                    { opacity: 1, y: 0, duration: 0.7, ease: 'power2.out', delay: 0.15 }
+                );
+            }
         });
     </script>
 </body>
