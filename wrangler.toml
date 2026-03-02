@@ -1,8 +1,20 @@
 name = "motivefx-com"
+main = "src/worker.js"
 compatibility_date = "2024-09-23"
+
+[vars]
+AWS_REGION = "us-east-1"
+FROM_EMAIL = "noreply@motivefx.com"
+OWNER_EMAIL = "emcweeney@gmail.com"
 
 [assets]
 directory = "./htdocs"
+binding = "ASSETS"
 
 [env.dev]
 name = "motivefx-com-dev"
+
+[env.dev.vars]
+AWS_REGION = "us-east-1"
+FROM_EMAIL = "noreply@motivefx.com"
+OWNER_EMAIL = "emcweeney@gmail.com"
