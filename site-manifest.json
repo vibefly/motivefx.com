@@ -1,0 +1,35 @@
+{
+  "site": "motivefx.com",
+  "framework": "static-html",
+  "description": "Engineering and creative services business site — hero, services, portfolio, contact form",
+  "root": "htdocs",
+  "editable_files": {
+    "htdocs/index.html": "Homepage — hero section, services, portfolio, contact form with AJAX submission",
+    "htdocs/styles.css": "All site styles — dark theme, neon yellow accent, card layout, responsive breakpoints",
+    "htdocs/js/animations.js": "GSAP scroll animations, smooth scrolling, nav toggle, morphing dot triggers",
+    "htdocs/js/morphing-dots.js": "Three.js particle system — shape morphing, mouse parallax, auto-rotation",
+    "htdocs/privacy-policy.html": "Privacy policy page",
+    "htdocs/terms-of-service.html": "Terms of service page",
+    "htdocs/thank-you.html": "Standalone thank-you page (legacy, form now uses inline thank-you)"
+  },
+  "protected_files": [
+    "htdocs/js/three.min.r134.js",
+    "htdocs/js/vanta.net.min.js",
+    "htdocs/images/favicon.png",
+    "htdocs/images/bg.png",
+    "CNAME",
+    ".gitignore"
+  ],
+  "assets_dir": "htdocs/images/",
+  "form_backend": {
+    "provider": "formspree",
+    "form_id": "mldqvzwg",
+    "method": "ajax"
+  },
+  "hosting": {
+    "provider": "cloudflare-pages",
+    "repo": "emcweeney/motivefx.com",
+    "main_branch": "main",
+    "dev_branch": "dev"
+  }
+}
