@@ -6,7 +6,26 @@ export default {
             return handleSubmit(request, env);
         }
 
-        return env.ASSETS.fetch(request);
+        const response = await env.ASSETS.fetch(request);
+
+        // Inject Turnstile into HTML pages
+        const ct = response.headers.get('content-type') || '';
+        if (ct.includes('text/html') && env.TURNSTILE_SITE_KEY) {
+            return new HTMLRewriter()
+                .on('head', {
+                    element(el) {
+                        el.append('<script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>', { html: true });
+                    }
+                })
+                .on('.cf-turnstile', {
+                    element(el) {
+                        el.setAttribute('data-sitekey', env.TURNSTILE_SITE_KEY);
+                    }
+                })
+                .transform(response);
+        }
+
+        return response;
     }
 };
 
@@ -119,3 +138,4 @@ function jsonError(message, status) {
         headers: { 'Content-Type': 'application/json' },
     });
 }
+
