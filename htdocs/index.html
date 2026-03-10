@@ -290,6 +290,9 @@
             }
 
             function showThankYou() {
+                /* Scroll contact section into view */
+                contactSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+
                 /* Crossfade headline to "Thank You" */
                 gsap.to(headline, {
                     opacity: 0, duration: 0.3,
@@ -319,6 +322,7 @@
     </script>
 </body>
 </html>
+
 
 
 
