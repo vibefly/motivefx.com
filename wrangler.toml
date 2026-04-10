@@ -3,7 +3,7 @@ main = "src/worker.js"
 compatibility_date = "2024-09-23"
 
 [vars]
-FROM_EMAIL = "noreply@vibefly.ai"
+FROM_EMAIL = "noreply@motivefx.com"
 OWNER_EMAIL = "emcweeney@gmail.com"
 TURNSTILE_SITE_KEY = "0x4AAAAAACmZ_NDSWLptZS6-"
 
@@ -15,6 +15,6 @@ binding = "ASSETS"
 name = "motivefx-com-dev"
 
 [env.dev.vars]
-FROM_EMAIL = "noreply@vibefly.ai"
+FROM_EMAIL = "noreply@motivefx.com"
 OWNER_EMAIL = "emcweeney@gmail.com"
 TURNSTILE_SITE_KEY = "0x4AAAAAACmZ_NDSWLptZS6-"

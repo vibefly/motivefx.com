@@ -67,7 +67,7 @@ async function handleSubmit(request, env) {
             return jsonError('Server configuration error.', 500);
         }
 
-        const fromEmail = env.FROM_EMAIL || 'noreply@vibefly.ai';
+        const fromEmail = env.FROM_EMAIL || 'noreply@motivefx.com';
 
         // Notification to site owner
         const notifLines = fields.map(f =>
